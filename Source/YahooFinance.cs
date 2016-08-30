@@ -61,7 +61,7 @@
             {
                 csv = this.GetCSV(url);
             }
-            catch (WebException ex)
+            catch (WebException)
             {
                 return false;
             }

@@ -174,7 +174,7 @@
             // toolStripButtonSplit
             // 
             this.toolStripButtonSplit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButtonSplit.Image = global::PetersInvestmentProgram.Properties.Resources.Split;
+            this.toolStripButtonSplit.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonSplit.Image")));
             this.toolStripButtonSplit.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonSplit.Name = "toolStripButtonSplit";
             this.toolStripButtonSplit.Size = new System.Drawing.Size(23, 22);
