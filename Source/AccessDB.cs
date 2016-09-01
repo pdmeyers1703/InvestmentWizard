@@ -1,17 +1,14 @@
 ﻿namespace PetersInvestmentProgram
 {
     using System;
-    using System.Collections.Generic;
     using System.Data;
     using System.Data.OleDb;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using System.Windows.Forms;
 
     public class AccessDB : IDatabase
     {
-        private const string DbLocation = "C://PeterRepo//Games//PetersInvestmentProgram//PeterInvestmentDB.accdb";
+        private const string DbLocation = "C://PeterRepo//Games//InvestmentWizard//PeterInvestmentDB.accdb";
         private const string ConnectionStr = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + DbLocation;
 
         public AccessDB()
