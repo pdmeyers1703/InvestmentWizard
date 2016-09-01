@@ -3,13 +3,15 @@
     using System;
     using System.Data;
     using System.Data.OleDb;
+    using System.IO;
     using System.Linq;
     using System.Windows.Forms;
 
     public class AccessDB : IDatabase
     {
-        private const string DbLocation = "C://PeterRepo//Games//InvestmentWizard//PeterInvestmentDB.accdb";
-        private const string ConnectionStr = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + DbLocation;
+        private const string LocalPathAndName = "..\\..\\DataBases\\DataStore.accdb";
+        private static readonly string DbLocation = Path.GetFullPath(LocalPathAndName);
+        private static readonly string ConnectionStr = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + DbLocation;
 
         public AccessDB()
         {
