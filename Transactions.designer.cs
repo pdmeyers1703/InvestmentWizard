@@ -9,7 +9,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PetersInvestmentProgram
+namespace InvestmentWizard
 {
 	using System.Data.Linq;
 	using System.Data.Linq.Mapping;

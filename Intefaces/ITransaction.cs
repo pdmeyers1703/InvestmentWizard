@@ -1,4 +1,4 @@
-﻿namespace PetersInvestmentProgram
+﻿namespace InvestmentWizard
 {
     using System;
 

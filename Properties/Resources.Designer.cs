@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PetersInvestmentProgram.Properties {
+namespace InvestmentWizard.Properties {
     using System;
     
     

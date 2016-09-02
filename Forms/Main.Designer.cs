@@ -1,4 +1,4 @@
-﻿namespace PetersInvestmentProgram
+﻿namespace InvestmentWizard
 {
     public partial class Main
     {
@@ -107,8 +107,8 @@
             this.SaleProceeds = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Dividends = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.transactionsBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.peterInvestmentDBDataSet = new PetersInvestmentProgram.Resources.PeterInvestmentDBDataSet();
-            this.transactionsTableAdapter = new PetersInvestmentProgram.Resources.PeterInvestmentDBDataSetTableAdapters.TransactionsTableAdapter();
+            this.peterInvestmentDBDataSet = new InvestmentWizard.Resources.PeterInvestmentDBDataSet();
+            this.transactionsTableAdapter = new InvestmentWizard.Resources.PeterInvestmentDBDataSetTableAdapters.TransactionsTableAdapter();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCurPos)).BeginInit();
             this.statusStrip1.SuspendLayout();

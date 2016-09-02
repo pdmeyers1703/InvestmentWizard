@@ -2,7 +2,7 @@
 // Copyright (c) Meyervinski, Inc. All rights reserved.
 // </copyright>
 
-namespace PetersInvestmentProgram
+namespace InvestmentWizard
 {
     using System;
     using System.Collections.Generic;

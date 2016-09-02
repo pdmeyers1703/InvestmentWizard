@@ -1,4 +1,4 @@
-﻿namespace PetersInvestmentProgram
+﻿namespace InvestmentWizard
 {
     partial class DlgSell
     {
