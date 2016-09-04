@@ -33,6 +33,8 @@
 
         private void Main_Load(object sender, EventArgs e)
         {
+            IDatabase database = Program.MyContainer.GetInstance<IDatabase>();
+            database.DatabasePath = "..\\..\\DataBases\\DataStore.accdb";
             try
             {
                 this.transactionController.Update();

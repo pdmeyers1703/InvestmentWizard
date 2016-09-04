@@ -7,14 +7,29 @@
     using System.Linq;
     using System.Windows.Forms;
 
+    /// <summary>
+    /// Basic database functions for MS Access.
+    /// </summary>
     public class AccessDB : IDatabase
     {
-        private const string LocalPathAndName = "..\\..\\DataBases\\DataStore.accdb";
-        private static readonly string DbLocation = Path.GetFullPath(LocalPathAndName);
-        private static readonly string ConnectionStr = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + DbLocation;
+        private const string ConnectionStr = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=";
 
-        public AccessDB()
+        private string databasePath = string.Empty;
+        
+        /// <summary>
+        /// Sets the name of the database to query
+        /// </summary>
+        public string DatabasePath 
         {
+            get
+            {
+                return this.databasePath;
+            }
+
+            set
+            {
+                this.databasePath = Path.GetFullPath(value);
+            }
         }
 
         public DataTable GetTableData(string tableName)
@@ -22,7 +37,7 @@
             DataTable dt = new DataTable();
             try
             {
-                using (OleDbConnection conn = new OleDbConnection(ConnectionStr))
+                using (OleDbConnection conn = new OleDbConnection(ConnectionStr + this.databasePath))
                 {
                     conn.Open();
                     OleDbCommand cmd = new OleDbCommand();
@@ -63,12 +78,13 @@
         }
 
         /// <summary>
-        /// 
+        /// Queries a database table to match the colunn critera for all 
+        /// matching rows.
         /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="col"></param>
-        /// <param name="criteria"></param>
-        /// <returns></returns>
+        /// <param name="tableName">Name of database table</param>
+        /// <param name="col">Column name</param>
+        /// <param name="criteria">Value in column to match</param>
+        /// <returns>DataTable with 1 or rows</returns>
         public DataTable GetRows(string tableName, string col, dynamic criteria)
         {
             DataTable dt = new DataTable();
