@@ -40,7 +40,7 @@
         {
             container = new Container();
 
-            container.Register<IDatabase, AccessDB>(Lifestyle.Singleton);
+            container.Register<IDatabase>(() => DatabaseFactory.Create(new AccessDB()), Lifestyle.Singleton);
             container.Register<IFinancialData, YahooFinancalDataClient>(Lifestyle.Singleton);
             container.Register<ITransactionsModel, TransactionsModel>(Lifestyle.Singleton);
             container.Register<ICurrentPositionsModel, CurrentPositionModel>(Lifestyle.Singleton);

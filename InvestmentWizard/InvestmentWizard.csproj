@@ -94,6 +94,7 @@
     <Compile Include="Forms\Buy.Designer.cs">
       <DependentUpon>Buy.cs</DependentUpon>
     </Compile>
+    <Compile Include="Source\DatabaseFactory.cs" />
     <Compile Include="Source\DataConverter.cs" />
     <Compile Include="Source\DataGridViewFormatter.cs" />
     <Compile Include="Source\DateTimeHelper.cs" />
