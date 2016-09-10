@@ -11,7 +11,9 @@
     {
         readonly private string AnyEquitySymbol = "ABC";
         readonly private double AnyQuanity = 99;
+        readonly private double OtherQuanity = 20;
         readonly private decimal AnyCost = 4567.87m;
+        readonly private decimal OtherCost = 3000.45m;
         readonly private DateTime? AnyPurchaseDate = DataConverter.Date("08/14/2016");
         readonly private decimal AnyLastPrice = 55.23m;
 
@@ -33,6 +35,16 @@
             transaction.Object.EquitySymbol = this.AnyEquitySymbol;
             transaction.Object.Quanity = this.AnyQuanity;
             transaction.Object.Cost = this.AnyCost;
+            transaction.Object.PurchasedDate = this.AnyPurchaseDate;
+            return transaction;
+        }
+
+        private Mock<ITransaction> GetOtherTransaction()
+        {
+            Mock<ITransaction> transaction = new Mock<ITransaction>().SetupAllProperties();
+            transaction.Object.EquitySymbol = this.AnyEquitySymbol;
+            transaction.Object.Quanity = this.OtherQuanity;
+            transaction.Object.Cost = this.OtherCost;
             transaction.Object.PurchasedDate = this.AnyPurchaseDate;
             return transaction;
         }
@@ -62,7 +74,7 @@
         }
 
         [TestMethod]
-        public void Update_AddsNewTransactionToOpenLust_IfOpenListDoesNotContainStockTest()
+        public void Update_AddsNewTransactionToOpenList_IfOpenListDoesNotContainStockTest()
         {
             //Arrange
             List<ITransaction> transactionList = new List<ITransaction>();
@@ -83,20 +95,15 @@
             //Arrange
             List<ITransaction> transactionList = new List<ITransaction>();
             transactionList.Add(this.GetAnyTransaction().Object);
-
-            Mock<IOpenPositions> openPositions = new Mock<IOpenPositions>().SetupAllProperties();
-            openPositions.Object.StockTicker = this.AnyEquitySymbol;
-            openPositions.Object.Quantity = 20;
-            openPositions.Object.Cost = 3001.45m;
-            this.model.CurrentPositions.Add(openPositions.Object);
+            transactionList.Add(this.GetOtherTransaction().Object);
 
             //Act
             this.model.Update(transactionList);
 
             //Assert
             Assert.AreEqual(this.AnyEquitySymbol, model.CurrentPositions[0].StockTicker);
-            Assert.AreEqual(this.AnyQuanity + 20, model.CurrentPositions[0].Quantity);
-            Assert.AreEqual(this.AnyCost + 3001.45m, model.CurrentPositions[0].Cost);
+            Assert.AreEqual(this.AnyQuanity + this.OtherQuanity, model.CurrentPositions[0].Quantity);
+            Assert.AreEqual(this.AnyCost + this.OtherCost, model.CurrentPositions[0].Cost);
         }
 
         [TestMethod]
