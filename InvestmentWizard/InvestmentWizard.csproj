@@ -48,7 +48,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Money.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SimpleInjector, Version=3.2.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
@@ -102,11 +103,6 @@
     <Compile Include="Source\OpenPositions.cs" />
     <Compile Include="Source\OpenPositionTotals.cs" />
     <Compile Include="Source\PriceQuote.cs" />
-    <Compile Include="Resources\PeterInvestmentDBDataSet.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>PeterInvestmentDBDataSet.xsd</DependentUpon>
-    </Compile>
     <Compile Include="Forms\Sell.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -126,11 +122,6 @@
     </Compile>
     <Compile Include="Source\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Transactions.designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Transactions.dbml</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="Forms\AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </EmbeddedResource>
@@ -166,25 +157,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Resources\PeterInvestmentDBDataSet.xsc">
-      <DependentUpon>PeterInvestmentDBDataSet.xsd</DependentUpon>
-    </None>
-    <None Include="Resources\PeterInvestmentDBDataSet.xsd">
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>PeterInvestmentDBDataSet.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Resources\PeterInvestmentDBDataSet.xss">
-      <DependentUpon>PeterInvestmentDBDataSet.xsd</DependentUpon>
-    </None>
-    <None Include="Transactions.dbml">
-      <Generator>MSLinqToSQLGenerator</Generator>
-      <LastGenOutput>Transactions.designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Transactions.dbml.layout">
-      <DependentUpon>Transactions.dbml</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -207,11 +179,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PeterInvestmentDB.accdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
   </ItemGroup>
   <ItemGroup>
@@ -227,7 +194,6 @@
     <None Include="Resources\Money.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Money.ico" />
     <None Include="Resources\Split.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
