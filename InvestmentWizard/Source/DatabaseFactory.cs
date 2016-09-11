@@ -8,7 +8,7 @@
     /// </summary>
     public static class DatabaseFactory
     {
-        private const string BlankDatabasePath = "..\\..\\DataBases\\BlankDataStore.accdb";
+        private const string BlankDatabasePath = "Resources//BlankDataStore.accdb";
         private const string DatabaseName = "DataStore.accdb";
         private const string DataFolder = "//InvestmentWizard";
         private static readonly string DatabasePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + DataFolder;
@@ -21,6 +21,7 @@
         /// <returns>user database assign with correct path</returns>
         public static IDatabase Create(IDatabase database)
         {
+            string blankDataBaseFile = Path.Combine(System.Windows.Forms.Application.StartupPath, BlankDatabasePath);
             string databaseFile = Path.Combine(DatabasePath, DatabaseName);
             
             if (File.Exists(databaseFile))
