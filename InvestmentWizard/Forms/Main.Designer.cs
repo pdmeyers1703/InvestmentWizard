@@ -15,9 +15,7 @@
         private System.Windows.Forms.TabPage tabPageMain;
         private System.Windows.Forms.TabPage tabPageTransactions;
         private System.Windows.Forms.DataGridView dataGridViewTransactions;
-        private Resources.PeterInvestmentDBDataSet peterInvestmentDBDataSet;
         private System.Windows.Forms.BindingSource transactionsBindingSource;
-        private Resources.PeterInvestmentDBDataSetTableAdapters.TransactionsTableAdapter transactionsTableAdapter;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton toolStripButtonAddTransaction;
 
@@ -107,8 +105,6 @@
             this.SaleProceeds = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Dividends = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.transactionsBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.peterInvestmentDBDataSet = new InvestmentWizard.Resources.PeterInvestmentDBDataSet();
-            this.transactionsTableAdapter = new InvestmentWizard.Resources.PeterInvestmentDBDataSetTableAdapters.TransactionsTableAdapter();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCurPos)).BeginInit();
             this.statusStrip1.SuspendLayout();
@@ -117,7 +113,6 @@
             this.tabPageTransactions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewTransactions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.transactionsBindingSource)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.peterInvestmentDBDataSet)).BeginInit();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -612,16 +607,6 @@
             // transactionsBindingSource
             // 
             this.transactionsBindingSource.DataMember = "Transactions";
-            this.transactionsBindingSource.DataSource = this.peterInvestmentDBDataSet;
-            // 
-            // peterInvestmentDBDataSet
-            // 
-            this.peterInvestmentDBDataSet.DataSetName = "PeterInvestmentDBDataSet";
-            this.peterInvestmentDBDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
-            // 
-            // transactionsTableAdapter
-            // 
-            this.transactionsTableAdapter.ClearBeforeFill = true;
             // 
             // Main
             // 
@@ -633,7 +618,7 @@
             this.Controls.Add(this.toolStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Main";
-            this.Text = "Investomatic";
+            this.Text = "Investment Wizard";
             this.Load += new System.EventHandler(this.Main_Load);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
@@ -645,7 +630,6 @@
             this.tabPageTransactions.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewTransactions)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.transactionsBindingSource)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.peterInvestmentDBDataSet)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
