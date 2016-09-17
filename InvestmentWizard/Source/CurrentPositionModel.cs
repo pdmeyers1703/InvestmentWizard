@@ -46,17 +46,12 @@
         /// Builds the latest list of current positions
         /// </summary>
         /// <param name="list"></param>
-        public void Update(IList<ITransaction> list)
+        public void UpdateList()
         {
-            if (list == null)
-            {
-                throw new ArgumentNullException();
-            }
-
             // Clear previously built list
             this.currentPositions.Clear();
 
-            foreach (var t in from r in list where r.SaleDate == null select r)
+            foreach (var t in from r in this.transactionsModel.Transactions where r.SaleDate == null select r)
             {
                 IOpenPositions open = this.GetPosition(t.EquitySymbol);
 

@@ -43,8 +43,9 @@
             container.Register<IDatabase>(() => DatabaseFactory.Create(new AccessDB()), Lifestyle.Singleton);
             container.Register<IFinancialData, YahooFinancalDataClient>(Lifestyle.Singleton);
             container.Register<ITransactionsModel, TransactionsModel>(Lifestyle.Singleton);
+            container.Register<ITransactionController, TransactionController>(Lifestyle.Singleton);
             container.Register<ICurrentPositionsModel, CurrentPositionModel>(Lifestyle.Singleton);
-            container.Register<Main>(Lifestyle.Singleton);
+            container.Register<ITransactionsView, Main>(Lifestyle.Singleton);
 
             container.Verify();
         }

@@ -16,9 +16,19 @@
        /// </summary>
         List<ITransaction> History { get; }
 
+        /// <summary>
+        /// Gets list of currently open transactions
+        /// </summary>
+        List<ITransaction> OpenList { get; }
+
+        /// <summary>
+        /// Sets the view for the controller
+        /// </summary>
+        ITransactionsView View { get; set; }
+
         void Update();
 
-        bool AddPurchase(DateTime date, string stock, double quantity, decimal cost);
+        bool AddPosition(DateTime date, string stock, double quantity, decimal cost);
 
         bool SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds);
 

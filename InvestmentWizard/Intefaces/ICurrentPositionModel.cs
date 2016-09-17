@@ -10,7 +10,7 @@
     {
         List<IOpenPositions> CurrentPositions { get; }
 
-        void Update(IList<ITransaction> history);
+        void UpdateList();
 
         void Update();
 

@@ -6,24 +6,36 @@
     using System.Data;
     using System.Drawing;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using System.Windows.Forms;
 
-    public partial class Main : Form
+    public partial class Main : Form, ITransactionsView
     {
         private IFinancialData financialDataClient = new YahooFinancalDataClient();
         private List<PriceQuote> prices = new List<PriceQuote>();
-        private TransactionController transactionController;
+        private ITransactionController transactionController;
         private ICurrentPositionsModel currentPositionsModel;
 
-        public Main(ICurrentPositionsModel currentPositionsModel)
+        public Main(
+            ICurrentPositionsModel currentPositionsModel,
+            ITransactionController transactionController)
         {
             this.InitializeComponent();
 
-            ITransactionsModel transactionModel = TransactionModelFactory.Create();
-            this.transactionController = new TransactionController(transactionModel, this.financialDataClient);
+            this.transactionController = transactionController;
             this.currentPositionsModel = currentPositionsModel;
+
+            this.transactionController.View = this;
+        }
+
+        /// <summary>
+        /// Updates the transactions data grid view
+        /// </summary>
+        /// <param name="transactions">List of transactions</param>
+        public void UpdateTransactionsDataGrid(IList<ITransaction> transactions)
+        {
+            var bindinglist = new BindingList<ITransaction>(transactions);
+            var source = new BindingSource(bindinglist, null);
+            this.dataGridViewTransactions.DataSource = source;
         }
 
         private void OnClick_UpdateQuotes(object sender, EventArgs e)
@@ -36,11 +48,7 @@
             try
             {
                 this.transactionController.Update();
-                var bindinglist = new BindingList<ITransaction>(this.transactionController.History);
-                var source = new BindingSource(bindinglist, null);
-                this.dataGridViewTransactions.DataSource = source;
-
-                this.currentPositionsModel.Update(this.transactionController.History);
+                this.currentPositionsModel.UpdateList();
                 var bindinglist2 = new BindingList<IOpenPositions>(this.currentPositionsModel.CurrentPositions);
                 var source2 = new BindingSource(bindinglist2, null);
                 this.dataGridViewCurPos.DataSource = source2;
@@ -77,33 +85,6 @@
                 MessageBox.Show("Failed to update current positions list.");
             }
             
-            Cursor.Current = Cursors.Default;
-        }
-
-        /// <summary>
-        /// Get the latest updated transaction history list and 
-        /// display it in a data grid view
-        /// </summary>
-        private void UpdateTransactionHistoryDataDridView()
-        {
-            Cursor.Current = Cursors.WaitCursor;
-
-            // Update transactions history data grid view
-            try
-            {
-                this.dataGridViewTransactions.Rows.Clear();
-                this.transactionController.Update();
-                var bindinglist = new BindingList<ITransaction>(this.transactionController.History);
-                var source = new BindingSource(bindinglist, null);
-                this.dataGridViewTransactions.DataSource = source;
-                this.dataGridViewTransactions.Refresh();
-            }
-            catch
-            {
-                MessageBox.Show("Failed to update transaction history list.");
-                throw;
-            }
-
             Cursor.Current = Cursors.Default;
         }
 
@@ -190,7 +171,7 @@
             this.toolStripButtonSellTransaction.Enabled = false;
             this.toolStripButtonSplit.Enabled = false;
             
-            this.currentPositionsModel.Update(this.transactionController.History);
+            this.currentPositionsModel.UpdateList();
             this.UpdateCurrentPositionsDataGridViewQuotes();
             var bindinglist = new BindingList<IOpenPositions>(this.currentPositionsModel.CurrentPositions);
             var source = new BindingSource(bindinglist, null);
@@ -213,14 +194,14 @@
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                if (!this.transactionController.AddPurchase(dlg.Date, dlg.Stock, dlg.Quantity, dlg.Cost))
+                if (!this.transactionController.AddPosition(dlg.Date, dlg.Stock, dlg.Quantity, dlg.Cost))
                 {
                     MessageBox.Show("Could not add stock \"" + dlg.Stock + "\" to  transactions list.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 else
                 {
-                    this.UpdateTransactionHistoryDataDridView();
+                    this.transactionController.Update();
                 }
 
                 dlg.Close();
@@ -236,12 +217,10 @@
         {
             List<ITransaction> openList = this.transactionController.OpenList;
             List<string> comboBoxString = new List<string>();
-            int i = 0;
 
             foreach (var o in openList.AsEnumerable())
             {
                 comboBoxString.Add(o.Quanity + " shares of " + o.EquitySymbol + " (" + o.PurchasedDate.Value.ToShortDateString() + ")");
-                ++i;
             }
 
             DlgSell dlg = new DlgSell(comboBoxString);
@@ -254,7 +233,7 @@
                 {
                     if (this.transactionController.SellPosition(transaction.RowID, dlg.SaleDate, dlg.Quantity, dlg.SaleProceeds))
                     {
-                        this.UpdateTransactionHistoryDataDridView();
+                        this.transactionController.Update();
                     }
                     else
                     {
@@ -289,7 +268,7 @@
             {
                 if (this.transactionController.SplitPosition(dlg.SplitEquity, dlg.SplitRatio))
                 {
-                    this.UpdateTransactionHistoryDataDridView();
+                    this.transactionController.Update();
                 }
                 else
                 {

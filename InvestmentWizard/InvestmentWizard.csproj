@@ -23,7 +23,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationRevision>3</ApplicationRevision>
     <ApplicationVersion>0.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -89,6 +89,7 @@
     </Compile>
     <Compile Include="Intefaces\IDatabase.cs" />
     <Compile Include="Intefaces\ICurrentPositionModel.cs" />
+    <Compile Include="Intefaces\ITransactionsView.cs" />
     <Compile Include="Intefaces\ITransaction.cs" />
     <Compile Include="Intefaces\ITransactionsModel.cs" />
     <Compile Include="Intefaces\IOpenPositions.cs" />

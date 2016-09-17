@@ -66,22 +66,16 @@
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void Update_ThrowsArgumentNullException_WhenNullTest()
-        {
-            //Act
-            this.model.Update(null);
-        }
-
-        [TestMethod]
         public void Update_AddsNewTransactionToOpenList_IfOpenListDoesNotContainStockTest()
         {
             //Arrange
             List<ITransaction> transactionList = new List<ITransaction>();
             transactionList.Add(this.GetAnyTransaction().Object);
+            this.transactionModel.SetupGet(m => m.Transactions).Returns(transactionList);
+                ;
 
             //Act
-            this.model.Update(transactionList);
+            this.model.UpdateList();
 
             //Assert
             Assert.AreEqual("ABC", model.CurrentPositions[0].StockTicker);
@@ -96,9 +90,10 @@
             List<ITransaction> transactionList = new List<ITransaction>();
             transactionList.Add(this.GetAnyTransaction().Object);
             transactionList.Add(this.GetOtherTransaction().Object);
+            this.transactionModel.SetupGet(m => m.Transactions).Returns(transactionList);
 
             //Act
-            this.model.Update(transactionList);
+            this.model.UpdateList();
 
             //Assert
             Assert.AreEqual(this.AnyEquitySymbol, model.CurrentPositions[0].StockTicker);
@@ -110,14 +105,14 @@
         public void Update_DoesNotAddNewTransaction_IfTransactionHasSaleDateTest()
         {
             //Arrange
-            this.transactionModel.SetupAllProperties();
-            this.transactionModel.Object.Transactions = new List<ITransaction>();
+            List<ITransaction> transactionList = new List<ITransaction>();
             ITransaction transaction = this.GetAnyTransaction().Object;
             transaction.SaleDate = DateTime.Now;
-            this.transactionModel.Object.Transactions.Add(transaction);
+            transactionList.Add(transaction);
+            this.transactionModel.SetupGet(m => m.Transactions).Returns(transactionList);
 
             //Act
-            this.model.Update(this.transactionModel.Object.Transactions);
+            this.model.UpdateList();
 
             //Assert
             Assert.AreEqual(0, this.model.CurrentPositions.Count);
@@ -130,12 +125,13 @@
             //Arrange
             this.SetupAnyFinancialData();
 
-            this.transactionModel.SetupAllProperties();
-            this.transactionModel.Object.Transactions = new List<ITransaction>();
-            this.transactionModel.Object.Transactions.Add(this.GetAnyTransaction().Object);
+            List<ITransaction> transactionList = new List<ITransaction>();
+            ITransaction transaction = this.GetAnyTransaction().Object;
+            transactionList.Add(transaction);
+            this.transactionModel.SetupGet(m => m.Transactions).Returns(transactionList);
 
             //Act
-            this.model.Update(this.transactionModel.Object.Transactions);
+            this.model.UpdateList();
 
             // Assert
             Assert.AreEqual(55.23m, model.CurrentPositions[0].CurrentPrice);
