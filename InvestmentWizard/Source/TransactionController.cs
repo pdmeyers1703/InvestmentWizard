@@ -4,15 +4,17 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
+    /// <summary>
+    /// Controller for all transactions
+    /// </summary>
     public class TransactionController : ITransactionController
     {
         /// <summary>
         /// private Members
         /// </summary>
         private ITransactionsModel transactionsModel;
+        private ITransactionsView transactionsView;
         private IFinancialData server;
 
         /// <summary>
@@ -65,11 +67,29 @@
         }
 
         /// <summary>
-        /// Updates to the latest data
+        /// Sets the view for the controller
+        /// </summary>
+        public ITransactionsView View
+        {
+            get
+            {
+                return this.transactionsView;
+            }
+
+            set
+            {
+                this.transactionsView = value;
+            }
+        }
+
+        /// <summary>
+        /// Updates the model and sends the results to the view
         /// </summary>
         public void Update()
         {
             this.transactionsModel.Update();
+            this.transactionsView.UpdateTransactionsDataGrid(
+                this.transactionsModel.Transactions.OrderByDescending(a => a.PurchasedDate).Reverse().ToList());
         }
 
         public List<ITransaction> GetTransactionForThisYear(string symbol)
@@ -79,7 +99,7 @@
                                 b.SaleDate.Value.Year == DateTime.Now.Year).ToList();
         }
 
-        public bool AddPurchase(DateTime date, string stock, double quantity, decimal cost)
+        public bool AddPosition(DateTime date, string stock, double quantity, decimal cost)
         {
             return this.transactionsModel.Add(date, stock, quantity, cost);
         }
