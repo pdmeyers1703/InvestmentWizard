@@ -2,29 +2,23 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     
     /// <summary>
-    /// Controller for transaction data store
+    /// Controller for transaction model
     /// </summary>
     public interface ITransactionController
     {
-       /// <summary>
-       /// List of transactions
-       /// </summary>
-        List<ITransaction> History { get; }
+        /// <summary>
+        /// Set observer for complete transaction list
+        /// </summary>
+        /// <param name="listChangedObserver">observer event handler</param>
+        void RegisterTransactionsListObserver(ListChangedEventHandler listChangedObserver);
 
         /// <summary>
-        /// Gets list of currently open transactions
+        /// Set observer for the open transactions list
         /// </summary>
-        List<ITransaction> OpenList { get; }
-
-        /// <summary>
-        /// Sets the view for the controller
-        /// </summary>
-        ITransactionsView View { get; set; }
+        /// <param name="listChangedObserver">observer event handler</param>
+        void RegisterOpenTransactionsListObserver(ListChangedEventHandler listChangedObserver);
 
         void Update();
 

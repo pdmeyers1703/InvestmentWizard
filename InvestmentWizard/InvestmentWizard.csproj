@@ -89,6 +89,8 @@
     </Compile>
     <Compile Include="Intefaces\IDatabase.cs" />
     <Compile Include="Intefaces\ICurrentPositionModel.cs" />
+    <Compile Include="Intefaces\IListObservable.cs" />
+    <Compile Include="Intefaces\IListReadModel.cs" />
     <Compile Include="Intefaces\ITransactionsView.cs" />
     <Compile Include="Intefaces\ITransaction.cs" />
     <Compile Include="Intefaces\ITransactionsModel.cs" />
@@ -115,6 +117,7 @@
     <Compile Include="Source\CurrentPositionModel.cs" />
     <Compile Include="Source\OpenPositions.cs" />
     <Compile Include="Source\OpenPositionTotals.cs" />
+    <Compile Include="Source\OpenTransactionsListReadModel.cs" />
     <Compile Include="Source\PriceQuote.cs" />
     <Compile Include="Forms\Sell.cs">
       <SubType>Form</SubType>
