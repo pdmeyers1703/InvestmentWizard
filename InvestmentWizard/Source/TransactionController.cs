@@ -13,105 +13,73 @@
         /// <summary>
         /// private Members
         /// </summary>
-        private ITransactionsModel transactionsModel;
-        private ITransactionsView transactionsView;
+        private IListObservable transactionsObserver;
+        private IListObservable openTransactionsObserver;
         private IFinancialData server;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="transactionsDB">transactions model</param>
+        /// <param name="transactionsObserver">observer for entire transactions list </param>
+        /// <param name="openTransactionsObserver">observer for all open transactions</param>
         /// <param name="dataServer">Data server for real-time quotes</param>
-        public TransactionController(ITransactionsModel transactionsModel, IFinancialData dataServer) 
+        public TransactionController(
+            IListObservable transactionsObserver, 
+            IListObservable openTransactionsObserver,
+            IFinancialData dataServer) 
         {
-            if (transactionsModel == null)
-            {
-                throw new ArgumentNullException("Database refernce is Null");
-            }
-            else
-            {
-                this.transactionsModel = transactionsModel;
-            }
-
-            if (dataServer == null)
-            {
-                throw new ArgumentException("Data Server reference is NULL");
-            }
-            else
-            {
-                this.server = dataServer;
-            }
-        }
-
-        public List<ITransaction> History
-        {
-            get
-            {
-                return this.transactionsModel.Transactions.OrderByDescending(a => a.PurchasedDate).Reverse().ToList();
-            }
-
-            private set
-            {
-                this.transactionsModel.Transactions = value;
-            }
-        }
-
-        public List<ITransaction> OpenList
-        {
-            get
-            {
-                return (from t in this.transactionsModel.Transactions.AsEnumerable()
-                        where t.SaleDate == null
-                        select t).ToList();
-            }
+            this.transactionsObserver = transactionsObserver;
+            this.openTransactionsObserver = openTransactionsObserver;
+            this.server = dataServer;
         }
 
         /// <summary>
-        /// Sets the view for the controller
+        /// Sets the list models observers
         /// </summary>
-        public ITransactionsView View
+        /// <param name="listChangedObserver">observer event handler</param>
+        public void RegisterTransactionsListObserver(ListChangedEventHandler listChangedObserver)
         {
-            get
-            {
-                return this.transactionsView;
-            }
-
-            set
-            {
-                this.transactionsView = value;
-            }
+            this.transactionsObserver.RegisterObserver(listChangedObserver);
         }
 
         /// <summary>
-        /// Updates the model and sends the results to the view
+        /// Set observer for the open transactions list
+        /// </summary>
+        /// <param name="listChangedObserver">observer event handler</param>
+        public void RegisterOpenTransactionsListObserver(ListChangedEventHandler listChangedObserver)
+        {
+            this.openTransactionsObserver.RegisterObserver(listChangedObserver);
+        }
+
+        /// <summary>
+        /// Updates the model
         /// </summary>
         public void Update()
         {
-            this.transactionsModel.Update();
-            this.transactionsView.UpdateTransactionsDataGrid(
-                this.transactionsModel.Transactions.OrderByDescending(a => a.PurchasedDate).Reverse().ToList());
+            this.transactionsObserver.Update();
+            this.openTransactionsObserver.Update();
         }
 
         public List<ITransaction> GetTransactionForThisYear(string symbol)
         {
-            return this.transactionsModel.Transactions.Where(a => a.EquitySymbol == symbol)
-                            .Where(b => b.SaleDate == null || 
-                                b.SaleDate.Value.Year == DateTime.Now.Year).ToList();
+            return new List<ITransaction>(); ///this.transactionsObserver.Transactions.Where(a => a.EquitySymbol == symbol)
+                                            ///         .Where(b => b.SaleDate == null || 
+                                            ///             b.SaleDate.Value.Year == DateTime.Now.Year).ToList();
         }
 
         public bool AddPosition(DateTime date, string stock, double quantity, decimal cost)
         {
-            return this.transactionsModel.Add(date, stock, quantity, cost);
+            return true; //// this.transactionsObserver.Add(date, stock, quantity, cost);
         }
 
         public bool SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds)
         {
-            return this.transactionsModel.Sell(rowIndex, saleDate, quantity, saleProceeds);
+            return true; //// this.transactionsObserver.Sell(rowIndex, saleDate, quantity, saleProceeds);
         }
 
         public bool SplitPosition(string equitySymbol, double splitRatio)
         {
-            return this.transactionsModel.Split(equitySymbol, splitRatio);
+            return true;  ////this.transactionsObserver.Split(equitySymbol, splitRatio);
         }
 
         /// <summary>
