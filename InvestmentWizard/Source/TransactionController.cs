@@ -15,50 +15,57 @@
         /// </summary>
         private IListObservable transactionsObserver;
         private IListObservable openTransactionsObserver;
+		private ITransactionsView transactionView;
         private IFinancialData server;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="transactionsObserver">observer for entire transactions list </param>
-        /// <param name="openTransactionsObserver">observer for all open transactions</param>
-        /// <param name="dataServer">Data server for real-time quotes</param>
-        public TransactionController(
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="transactionsObserver">observer for entire transactions list </param>
+		/// <param name="openTransactionsObserver">observer for all open transactions</param>
+		/// <param name="dataServer">Data server for real-time quotes</param>
+		public TransactionController(
             IListObservable transactionsObserver, 
             IListObservable openTransactionsObserver,
             IFinancialData dataServer) 
         {
-            this.transactionsObserver = transactionsObserver;
-            this.openTransactionsObserver = openTransactionsObserver;
-            this.server = dataServer;
-        }
+			this.transactionsObserver = transactionsObserver;
+			this.openTransactionsObserver = openTransactionsObserver;
+			this.server = dataServer;
+		}
 
-        /// <summary>
-        /// Sets the list models observers
-        /// </summary>
-        /// <param name="listChangedObserver">observer event handler</param>
-        public void RegisterTransactionsListObserver(ListChangedEventHandler listChangedObserver)
-        {
-            this.transactionsObserver.RegisterObserver(listChangedObserver);
-        }
+		/// <summary>
+		/// Sets the view for the controller
+		/// </summary>
+		public ITransactionsView TransactionView
+		{
+			get
+			{
+				return this.transactionView;
+			}
 
-        /// <summary>
-        /// Set observer for the open transactions list
-        /// </summary>
-        /// <param name="listChangedObserver">observer event handler</param>
-        public void RegisterOpenTransactionsListObserver(ListChangedEventHandler listChangedObserver)
-        {
-            this.openTransactionsObserver.RegisterObserver(listChangedObserver);
-        }
+			set
+			{
+				this.transactionView = value;
+			}
+		}
 
-        /// <summary>
-        /// Updates the model
-        /// </summary>
-        public void Update()
-        {
-            this.transactionsObserver.Update();
-            this.openTransactionsObserver.Update();
-        }
+		/// <summary>
+		/// Initialize controller features
+		/// </summary>
+		public void Initialize()
+		{
+			this.RegisterModelsWithView();
+		}
+
+		/// <summary>
+		/// Updates the model
+		/// </summary>
+		public void Update()
+		{
+			this.transactionsObserver.Update();
+			this.openTransactionsObserver.Update();
+		}
 
         public List<ITransaction> GetTransactionForThisYear(string symbol)
         {
@@ -81,6 +88,20 @@
         {
             return true;  ////this.transactionsObserver.Split(equitySymbol, splitRatio);
         }
+
+		/// <summary>
+		/// Register all view observers to the model									 
+		/// </summary>
+		private void RegisterModelsWithView()
+		{
+			ListChangedEventHandler completeTransactionHandler;
+			this.transactionView.RegisterCompleteTransactionList(out completeTransactionHandler);
+			this.transactionsObserver.RegisterObserver(completeTransactionHandler);
+
+			ListChangedEventHandler openTransactionHandler;
+			this.transactionView.RegisterOpenTransactionList(out openTransactionHandler);
+			this.transactionsObserver.RegisterObserver(openTransactionHandler);
+		}
 
         /// <summary>
         /// Returns all the dividend payment for an equity between a particular time range
