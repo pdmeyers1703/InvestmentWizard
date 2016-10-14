@@ -1,17 +1,22 @@
 ﻿namespace InvestmentWizard
 {
-    using System;
-    using System.Collections.Generic;
+	using System.Collections.Generic;
 
-    /// <summary>
-    /// Actions the view must implement
-    /// </summary>
-    public interface ITransactionsView
-    {
-        /// <summary>
-        /// Updates the transactions data grid view
-        /// </summary>
-        /// <param name="transactions">List of transactions</param>
-        void UpdateTransactionsDataGrid(IList<ITransaction> transactions);
-    }
+	/// <summary>
+	/// Actions the view must implement
+	/// </summary>
+	public interface ITransactionsView
+	{
+		/// <summary>
+		/// Passing the view handler to the controller
+		/// </summary>
+		/// <param name="handler">list change handler</param>
+		void RegisterCompleteTransactionList(out ListChangedEventHandler handler);
+
+		/// <summary>
+		/// Passing the view handlers to the controller
+		/// </summary>
+		/// <param name="handler"></param>
+		void RegisterOpenTransactionList(out ListChangedEventHandler handler);
+	}
 }

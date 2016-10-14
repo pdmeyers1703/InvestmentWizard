@@ -1,24 +1,21 @@
 ﻿namespace InvestmentWizard
 {
-    using System;
-    using System.Collections.Generic;
-    
+	using System;
+
     /// <summary>
     /// Controller for transaction model
     /// </summary>
     public interface ITransactionController
     {
-        /// <summary>
-        /// Set observer for complete transaction list
-        /// </summary>
-        /// <param name="listChangedObserver">observer event handler</param>
-        void RegisterTransactionsListObserver(ListChangedEventHandler listChangedObserver);
+		/// <summary>
+		/// Sets controllers view
+		/// </summary>
+		 ITransactionsView TransactionView { get; set; }
 
-        /// <summary>
-        /// Set observer for the open transactions list
-        /// </summary>
-        /// <param name="listChangedObserver">observer event handler</param>
-        void RegisterOpenTransactionsListObserver(ListChangedEventHandler listChangedObserver);
+		/// <summary>
+		/// Initialize controller features
+		/// </summary>
+		void Initialize();
 
         void Update();
 

@@ -42,14 +42,15 @@
 
             container.Register<IDatabase>(() => DatabaseFactory.Create(new AccessDB()), Lifestyle.Singleton);
             container.Register<IFinancialData, YahooFinancalDataClient>(Lifestyle.Singleton);
-            var registration = Lifestyle.Singleton.CreateRegistration<TransactionsListReadModel>(container);
-            container.AddRegistration(typeof(IListReadModel), registration);
-            container.RegisterConditional(typeof(IListObservable), registration, o => o.Consumer.Target.Parameter.Name.Equals("transactionsObserver"));
 
-            container.RegisterConditional<IListObservable, OpenTransactionsListReadModel>(Lifestyle.Singleton, o => o.Consumer.Target.Parameter.Name.Equals("openTransactionsObserver"));
-            container.Register<ITransactionController, TransactionController>(Lifestyle.Singleton);
+			var registration = Lifestyle.Singleton.CreateRegistration<TransactionsListReadModel>(container);
+			container.AddRegistration(typeof(IListReadModel), registration);
+			container.RegisterConditional(typeof(IListObservable), registration, o => o.Consumer.Target.Parameter.Name.Equals("transactionsObserver"));
+			container.RegisterConditional<IListObservable, OpenTransactionsListReadModel>(Lifestyle.Singleton, o => o.Consumer.Target.Parameter.Name.Equals("openTransactionsObserver"));
+
+			container.Register<ITransactionController, TransactionController>(Lifestyle.Singleton);
             container.Register<ICurrentPositionsModel, CurrentPositionModel>(Lifestyle.Singleton);
-            container.Register<Main>(Lifestyle.Singleton);
+            container.Register<ITransactionsView, Main>(Lifestyle.Singleton);
 
             container.Verify();
         }

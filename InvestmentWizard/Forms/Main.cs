@@ -8,8 +8,8 @@
     using System.Linq;
     using System.Windows.Forms;
 
-    public partial class Main : Form
-    {
+    public partial class Main : Form, ITransactionsView
+	{
         private IFinancialData financialDataClient = new YahooFinancalDataClient();
         private List<PriceQuote> prices = new List<PriceQuote>();
         private ITransactionController transactionController;
@@ -23,19 +23,37 @@
             this.InitializeComponent();
 
             this.transactionController = transactionController;
+			this.transactionController.TransactionView = this;
             this.currentPositionsModel = currentPositionsModel;
-
-            this.transactionController.RegisterTransactionsListObserver(this.OnTransactionListChanged);
-            this.transactionController.RegisterOpenTransactionsListObserver(this.OpenTransactionListChanged);
         }
 
-        private void OnClick_UpdateQuotes(object sender, EventArgs e)
+		/// <summary>
+		/// Passing the view handler to the controller
+		/// </summary>
+		/// <param name="handler">list change handler</param>
+		public void RegisterCompleteTransactionList(out ListChangedEventHandler handler)
+		{
+			handler = new ListChangedEventHandler(this.OnTransactionListChanged);
+		}
+
+		/// <summary>
+		/// Passing the view handler to the controller
+		/// </summary>
+		/// <param name="handler">list change handler</param>
+		public void RegisterOpenTransactionList(out ListChangedEventHandler handler)
+		{
+			handler = new ListChangedEventHandler(this.OpenTransactionListChanged);
+		}
+
+		private void OnClick_UpdateQuotes(object sender, EventArgs e)
         {
             this.UpdateCurrentPositionsDataGridViewQuotes();
         }
 
         private void Main_Load(object sender, EventArgs e)
         {
+			this.transactionController.Initialize();
+
             try
             {
                 this.transactionController.Update();
@@ -181,22 +199,8 @@
 
         private void ToolStripButtonAddTransaction_Click(object sender, EventArgs e)
         {
-            DlgBuyTransaction dlg = new DlgBuyTransaction();
-
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                if (!this.transactionController.AddPosition(dlg.Date, dlg.Stock, dlg.Quantity, dlg.Cost))
-                {
-                    MessageBox.Show("Could not add stock \"" + dlg.Stock + "\" to  transactions list.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                else
-                {
-                    this.transactionController.Update();
-                }
-
-                dlg.Close();
-            }
+            DlgBuyTransaction dlg = new DlgBuyTransaction(this.transactionController);
+            dlg.ShowDialog();
         }
 
         /// <summary>
@@ -298,7 +302,7 @@
         /// <summary>
         /// Observer registed to model
         /// </summary>
-        /// <param name="openTransactionslist">open transactions list</param>
+        /// <param name="openTransactionslist">open </param>
         private void OpenTransactionListChanged(IList<IList<string>> openTransactionslist)
         {
             this.openTransactionsList = openTransactionslist;
