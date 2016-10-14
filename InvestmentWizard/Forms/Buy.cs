@@ -1,21 +1,29 @@
 ﻿namespace InvestmentWizard
 {
     using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Data;
+    using System.Drawing;
     using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
     using System.Windows.Forms;
-    
-    /// <summary>
-    /// Dialog box to enter an stock buy
-    /// </summary>
+
     public partial class DlgBuyTransaction : Form
     {
-        private ITransactionController transactionController;
-
-        public DlgBuyTransaction(ITransactionController controller)
+        public DlgBuyTransaction()
         {
             this.InitializeComponent();
-            this.transactionController = controller;
         }
+
+        public DateTime Date { get; private set; }
+        
+        public string Stock { get; private set; }
+        
+        public double Quantity { get; private set; }
+        
+        public decimal Cost { get; private set; }
 
         private void BtnBuyTransactionAccept_Click(object sender, EventArgs e)
         {
@@ -39,11 +47,10 @@
             {
                 if (DialogResult.Yes == MessageBox.Show("Are you sure you would like to Add this purchase?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
                 {
-                    this.transactionController.AddPosition(
-                        this.dateTimePicker.Value,
-                        this.textBoxTickerSymbol.Text,
-                        Convert.ToDouble(this.textBoxQuantity.Text),
-                        Convert.ToDecimal(this.textBoxCost.Text));
+                    this.Date = this.dateTimePicker.Value;
+                    this.Stock = this.textBoxTickerSymbol.Text;
+                    this.Quantity = Convert.ToDouble(this.textBoxQuantity.Text);
+                    this.Cost = Convert.ToDecimal(this.textBoxCost.Text);
                 }
                 else
                 {

@@ -181,8 +181,22 @@
 
         private void ToolStripButtonAddTransaction_Click(object sender, EventArgs e)
         {
-            DlgBuyTransaction dlg = new DlgBuyTransaction(this.transactionController);
-            dlg.ShowDialog();
+            DlgBuyTransaction dlg = new DlgBuyTransaction();
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                if (!this.transactionController.AddPosition(dlg.Date, dlg.Stock, dlg.Quantity, dlg.Cost))
+                {
+                    MessageBox.Show("Could not add stock \"" + dlg.Stock + "\" to  transactions list.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                else
+                {
+                    this.transactionController.Update();
+                }
+
+                dlg.Close();
+            }
         }
 
         /// <summary>
@@ -284,7 +298,7 @@
         /// <summary>
         /// Observer registed to model
         /// </summary>
-        /// <param name="openTransactionslist">open </param>
+        /// <param name="openTransactionslist">open transactions list</param>
         private void OpenTransactionListChanged(IList<IList<string>> openTransactionslist)
         {
             this.openTransactionsList = openTransactionslist;
