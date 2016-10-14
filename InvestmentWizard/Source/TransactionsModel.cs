@@ -5,10 +5,8 @@
     using System.Data;
     using System.Diagnostics;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
-    public class TransactionsModel : ITransactionsModel
+    public class TransactionsListReadModel : IListObservable, IListReadModel
     {
         private readonly string transactionTableName = "Transactions";
         private readonly string[] columnNames = 
@@ -27,12 +25,14 @@
         private IList<ITransaction> transactions;
         private bool refresh = true;
 
-        public TransactionsModel(IDatabase database)
+        public TransactionsListReadModel(IDatabase database)
         {
             this.database = database;
             Debug.Assert(this.database != null, "Database is null reference");
             this.transactions = new List<ITransaction>();
         }
+
+        protected event ListChangedEventHandler ListChangedObserver;
 
         private enum ColumnIndex
         {
@@ -46,26 +46,35 @@
             Dividends,
         }
 
-        /// <summary>
-        /// Property containing the complete list of transactions
-        /// </summary>
-        public IList<ITransaction> Transactions 
-        { 
-            get 
-            { 
+        public IList<ITransaction> OpenTransactionsList
+        {
+            get
+            {
+                return this.transactions.Where(t => t.SaleDate == null).ToList();
+            }
+        }
+
+        protected IList<ITransaction> Transactions
+        {
+            get
+            {
                 return this.transactions;
             }
+        }
 
-            set
-            {
-                this.transactions = value;
-            }
+        /// <summary>
+        /// Register observers for this model
+        /// </summary>
+        /// <param name="listChangedObserver">event handler</param>
+        public void RegisterObserver(ListChangedEventHandler listChangedObserver)
+        {
+            this.ListChangedObserver += listChangedObserver;
         }
 
         /// <summary>
         /// Get entire transaction table in the database if refresh is needed
         /// </summary>
-        public void Update()
+        public virtual void Update()
         {
             if (this.refresh)
             {
@@ -147,6 +156,45 @@
         }
 
         /// <summary>
+        /// Fires when list changes
+        /// </summary>
+        /// <param name="list">2 dimensional list of strings</param>
+        protected void OnListChanged(IList<IList<string>> list)
+        {
+            this.ListChangedObserver(list);
+        }
+
+        /// <summary>
+        /// Converts a list of transactions to string for displayablity 
+        /// </summary>
+        /// <param name="trasactions"> list of transactions</param>
+        /// <returns> 2 dimensional list of strings </returns>
+        protected IList<IList<string>> ToListOfListOfStrings(IList<ITransaction> trasactions)
+        {
+            IList<IList<string>> list = new List<IList<string>>();
+
+            foreach (var row in this.transactions)
+            {
+                List<string> columns = new List<string>
+                {
+                    row.PurchasedDate == null ? string.Empty : row.PurchasedDate.Value.ToShortDateString(),
+                    row.EquitySymbol,
+                    row.Quanity.ToString(),
+                    row.PurchasePrice.ToString(),
+                    row.Cost.ToString(),
+                    row.SaleDate == null ? string.Empty : row.SaleDate.Value.ToShortDateString(),
+                    row.SalePrice.ToString(),
+                    row.SaleProceeds.ToString(),
+                    row.Dividends.ToString(),
+                };
+
+                list.Add(columns);
+            }
+
+            return list;
+        }
+
+        /// <summary>
         /// Get entire transaction table in the database
         /// </summary>
         private void DoUpdate()
@@ -180,6 +228,8 @@
                 }
 
                 this.SortByRowID((List<ITransaction>)this.transactions);
+
+                this.OnListChanged(this.ToListOfListOfStrings((IList<ITransaction>)this.transactions) as IList<IList<string>>);
             }
             catch
             {
@@ -199,7 +249,7 @@
                 return p1.RowID.CompareTo(p2.RowID);
             });
         }
-
+ 
         /// <summary>
         /// 
         /// </summary>

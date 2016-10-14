@@ -1,24 +1,25 @@
 ﻿namespace InvestmentWizard
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    
+	using System;
+
     /// <summary>
-    /// Controller for transaction data store
+    /// Controller for transaction model
     /// </summary>
     public interface ITransactionController
     {
-       /// <summary>
-       /// List of transactions
-       /// </summary>
-        List<ITransaction> History { get; }
+		/// <summary>
+		/// Sets controllers view
+		/// </summary>
+		 ITransactionsView TransactionView { get; set; }
+
+		/// <summary>
+		/// Initialize controller features
+		/// </summary>
+		void Initialize();
 
         void Update();
 
-        bool AddPurchase(DateTime date, string stock, double quantity, decimal cost);
+        bool AddPosition(DateTime date, string stock, double quantity, decimal cost);
 
         bool SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds);
 

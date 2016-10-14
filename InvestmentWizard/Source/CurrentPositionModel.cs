@@ -12,14 +12,15 @@
         private List<IOpenPositions> currentPositions;
         private OpenPositionTotals totals = null;
         private IFinancialData server;
-        private ITransactionsModel transactionsModel;
+        private IListReadModel transactionsModel;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="server">client for real-time quotes</param>
         /// <param name="transactions">database</param>
-        public CurrentPositionModel(IFinancialData server, ITransactionsModel transactionsModel)
+        /// <param name="transactionsModel">transactions model</param>
+        public CurrentPositionModel(IFinancialData server, IListReadModel transactionsModel)
         {
             this.currentPositions = new List<IOpenPositions>();
             this.server = server;
@@ -46,17 +47,12 @@
         /// Builds the latest list of current positions
         /// </summary>
         /// <param name="list"></param>
-        public void Update(IList<ITransaction> list)
+        public void UpdateList()
         {
-            if (list == null)
-            {
-                throw new ArgumentNullException();
-            }
-
             // Clear previously built list
             this.currentPositions.Clear();
 
-            foreach (var t in from r in list where r.SaleDate == null select r)
+            foreach (var t in this.transactionsModel.OpenTransactionsList)
             {
                 IOpenPositions open = this.GetPosition(t.EquitySymbol);
 
@@ -244,9 +240,9 @@
         {
             decimal cost = 0;
 
-            IEnumerable<ITransaction> transactions = from t in this.transactionsModel.Transactions
-                                                      where t.EquitySymbol == equitySymbol
-                                                      select t;
+            IEnumerable<ITransaction> transactions = from t in this.transactionsModel.OpenTransactionsList
+                                                     where t.EquitySymbol == equitySymbol
+                                                     select t;
                 
             foreach (var t in transactions)
             {

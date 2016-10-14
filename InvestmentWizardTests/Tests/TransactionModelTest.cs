@@ -12,7 +12,7 @@
     {
         private Mock<IDatabase> db;
         private Mock<IFinancialData> server;
-        private ITransactionsModel model;
+        private IListObservable model;
 
         [TestInitialize]
         public void Setup()
@@ -20,7 +20,7 @@
             db = new Mock<IDatabase>();
             server = new Mock<IFinancialData>();
 
-            this.model = new TransactionsModel(db.Object);
+            this.model = new TransactionsReadModel(db.Object);
         }
 
         [TestMethod]

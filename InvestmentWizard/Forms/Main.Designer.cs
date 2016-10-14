@@ -94,7 +94,7 @@
             this.tabPageMain = new System.Windows.Forms.TabPage();
             this.tabPageTransactions = new System.Windows.Forms.TabPage();
             this.dataGridViewTransactions = new System.Windows.Forms.DataGridView();
-            this.RowID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.transactionsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.PurchaseDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.EquitySymbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Quantity2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -104,7 +104,6 @@
             this.SalePrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SaleProceeds = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Dividends = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.transactionsBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewCurPos)).BeginInit();
             this.statusStrip1.SuspendLayout();
@@ -473,7 +472,6 @@
             this.dataGridViewTransactions.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle14;
             this.dataGridViewTransactions.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewTransactions.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.RowID,
             this.PurchaseDate,
             this.EquitySymbol,
             this.Quantity2,
@@ -489,19 +487,14 @@
             this.dataGridViewTransactions.Size = new System.Drawing.Size(823, 368);
             this.dataGridViewTransactions.TabIndex = 0;
             // 
-            // RowID
+            // transactionsBindingSource
             // 
-            this.RowID.DataPropertyName = "RowID";
-            this.RowID.HeaderText = "Column1";
-            this.RowID.Name = "RowID";
-            this.RowID.ReadOnly = true;
-            this.RowID.Visible = false;
-            this.RowID.Width = 80;
+            this.transactionsBindingSource.DataMember = "Transactions";
             // 
             // PurchaseDate
             // 
             this.PurchaseDate.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCellsExceptHeader;
-            this.PurchaseDate.DataPropertyName = "PurchasedDate";
+            this.PurchaseDate.DataPropertyName = "PurchaseDate";
             dataGridViewCellStyle15.Format = "d";
             dataGridViewCellStyle15.NullValue = null;
             this.PurchaseDate.DefaultCellStyle = dataGridViewCellStyle15;
@@ -604,10 +597,6 @@
             this.Dividends.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.Dividends.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
-            // transactionsBindingSource
-            // 
-            this.transactionsBindingSource.DataMember = "Transactions";
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -656,7 +645,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn percentGainLoss;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel4;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel5;
-        private System.Windows.Forms.DataGridViewTextBoxColumn RowID;
         private System.Windows.Forms.DataGridViewTextBoxColumn PurchaseDate;
         private System.Windows.Forms.DataGridViewTextBoxColumn EquitySymbol;
         private System.Windows.Forms.DataGridViewTextBoxColumn Quantity2;
@@ -666,6 +654,5 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn SalePrice;
         private System.Windows.Forms.DataGridViewTextBoxColumn SaleProceeds;
         private System.Windows.Forms.DataGridViewTextBoxColumn Dividends;
-
     }
 }

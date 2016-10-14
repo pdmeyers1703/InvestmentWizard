@@ -6,41 +6,58 @@
     using System.Data;
     using System.Drawing;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using System.Windows.Forms;
 
-    public partial class Main : Form
-    {
+    public partial class Main : Form, ITransactionsView
+	{
         private IFinancialData financialDataClient = new YahooFinancalDataClient();
         private List<PriceQuote> prices = new List<PriceQuote>();
-        private TransactionController transactionController;
+        private ITransactionController transactionController;
         private ICurrentPositionsModel currentPositionsModel;
-
-        public Main(ICurrentPositionsModel currentPositionsModel)
+        private IList<IList<string>> openTransactionsList;
+        
+        public Main(
+            ICurrentPositionsModel currentPositionsModel,
+            ITransactionController transactionController)
         {
             this.InitializeComponent();
 
-            ITransactionsModel transactionModel = TransactionModelFactory.Create();
-            this.transactionController = new TransactionController(transactionModel, this.financialDataClient);
+            this.transactionController = transactionController;
+			this.transactionController.TransactionView = this;
             this.currentPositionsModel = currentPositionsModel;
         }
 
-        private void OnClick_UpdateQuotes(object sender, EventArgs e)
+		/// <summary>
+		/// Passing the view handler to the controller
+		/// </summary>
+		/// <param name="handler">list change handler</param>
+		public void RegisterCompleteTransactionList(out ListChangedEventHandler handler)
+		{
+			handler = new ListChangedEventHandler(this.OnTransactionListChanged);
+		}
+
+		/// <summary>
+		/// Passing the view handler to the controller
+		/// </summary>
+		/// <param name="handler">list change handler</param>
+		public void RegisterOpenTransactionList(out ListChangedEventHandler handler)
+		{
+			handler = new ListChangedEventHandler(this.OpenTransactionListChanged);
+		}
+
+		private void OnClick_UpdateQuotes(object sender, EventArgs e)
         {
             this.UpdateCurrentPositionsDataGridViewQuotes();
         }
 
         private void Main_Load(object sender, EventArgs e)
         {
+			this.transactionController.Initialize();
+
             try
             {
                 this.transactionController.Update();
-                var bindinglist = new BindingList<ITransaction>(this.transactionController.History);
-                var source = new BindingSource(bindinglist, null);
-                this.dataGridViewTransactions.DataSource = source;
-
-                this.currentPositionsModel.Update(this.transactionController.History);
+                this.currentPositionsModel.UpdateList();
                 var bindinglist2 = new BindingList<IOpenPositions>(this.currentPositionsModel.CurrentPositions);
                 var source2 = new BindingSource(bindinglist2, null);
                 this.dataGridViewCurPos.DataSource = source2;
@@ -77,33 +94,6 @@
                 MessageBox.Show("Failed to update current positions list.");
             }
             
-            Cursor.Current = Cursors.Default;
-        }
-
-        /// <summary>
-        /// Get the latest updated transaction history list and 
-        /// display it in a data grid view
-        /// </summary>
-        private void UpdateTransactionHistoryDataDridView()
-        {
-            Cursor.Current = Cursors.WaitCursor;
-
-            // Update transactions history data grid view
-            try
-            {
-                this.dataGridViewTransactions.Rows.Clear();
-                this.transactionController.Update();
-                var bindinglist = new BindingList<ITransaction>(this.transactionController.History);
-                var source = new BindingSource(bindinglist, null);
-                this.dataGridViewTransactions.DataSource = source;
-                this.dataGridViewTransactions.Refresh();
-            }
-            catch
-            {
-                MessageBox.Show("Failed to update transaction history list.");
-                throw;
-            }
-
             Cursor.Current = Cursors.Default;
         }
 
@@ -190,7 +180,7 @@
             this.toolStripButtonSellTransaction.Enabled = false;
             this.toolStripButtonSplit.Enabled = false;
             
-            this.currentPositionsModel.Update(this.transactionController.History);
+            this.currentPositionsModel.UpdateList();
             this.UpdateCurrentPositionsDataGridViewQuotes();
             var bindinglist = new BindingList<IOpenPositions>(this.currentPositionsModel.CurrentPositions);
             var source = new BindingSource(bindinglist, null);
@@ -213,14 +203,14 @@
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                if (!this.transactionController.AddPurchase(dlg.Date, dlg.Stock, dlg.Quantity, dlg.Cost))
+                if (!this.transactionController.AddPosition(dlg.Date, dlg.Stock, dlg.Quantity, dlg.Cost))
                 {
                     MessageBox.Show("Could not add stock \"" + dlg.Stock + "\" to  transactions list.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 else
                 {
-                    this.UpdateTransactionHistoryDataDridView();
+                    this.transactionController.Update();
                 }
 
                 dlg.Close();
@@ -234,36 +224,32 @@
         /// <param name="e"></param>
         private void ToolStripButtonSellTransaction_Click(object sender, EventArgs e)
         {
-            List<ITransaction> openList = this.transactionController.OpenList;
-            List<string> comboBoxString = new List<string>();
-            int i = 0;
-
-            foreach (var o in openList.AsEnumerable())
+            List<string> sellComboBoxStrings = new List<string>();
+            foreach (var o in this.openTransactionsList.AsEnumerable())
             {
-                comboBoxString.Add(o.Quanity + " shares of " + o.EquitySymbol + " (" + o.PurchasedDate.Value.ToShortDateString() + ")");
-                ++i;
+                sellComboBoxStrings.Add(o[3] + " shares of " + o[1] + " (" + o[0] + ")");
             }
 
-            DlgSell dlg = new DlgSell(comboBoxString);
+            DlgSell dlg = new DlgSell(sellComboBoxStrings);
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                ITransaction transaction = openList[dlg.SelectedSellTransaction];
+                IList<string> transaction = this.openTransactionsList[dlg.SelectedSellTransaction];
 
-                if (dlg.Quantity <= transaction.Quanity)
+                if (dlg.Quantity <= Convert.ToDouble(transaction[2]))
                 {
-                    if (this.transactionController.SellPosition(transaction.RowID, dlg.SaleDate, dlg.Quantity, dlg.SaleProceeds))
+                    if (this.transactionController.SellPosition(dlg.SelectedSellTransaction, dlg.SaleDate, dlg.Quantity, dlg.SaleProceeds))
                     {
-                        this.UpdateTransactionHistoryDataDridView();
+                        this.transactionController.Update();
                     }
                     else
                     {
-                        MessageBox.Show("Could not sell stock \"" + openList[dlg.SelectedSellTransaction].EquitySymbol + "\"", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Could not sell stock \"" + transaction[1] + "\"", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Could not sell stock \"" + openList[dlg.SelectedSellTransaction].EquitySymbol + "\"", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Could not sell stock \"" + transaction[1] + "\"", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -279,17 +265,13 @@
 
         private void ToolStripButtonSplit_Click(object sender, EventArgs e)
         {
-            List<ITransaction> openList = this.transactionController.OpenList;
-
-            List<string> comboBoxString = openList.Select(a => a.EquitySymbol).Distinct().ToList();
-
-            DlgSplit dlg = new DlgSplit(comboBoxString);
+            DlgSplit dlg = new DlgSplit(this.openTransactionsList.Select(a => a[1]).Distinct().ToList());
 
             if (DialogResult.OK == dlg.ShowDialog())
             {
                 if (this.transactionController.SplitPosition(dlg.SplitEquity, dlg.SplitRatio))
                 {
-                    this.UpdateTransactionHistoryDataDridView();
+                    this.transactionController.Update();
                 }
                 else
                 {
@@ -320,6 +302,46 @@
             {
                 this.toolStripStatusLabel5.ForeColor = Color.Green;
             }
+        }
+
+        /// <summary>
+        /// Observer registered to model
+        /// </summary>
+        /// <param name="transactionsList">transactions list</param>
+        private void OnTransactionListChanged(IList<IList<string>> transactionsList)
+        {
+            this.UpdateDataGrid(this.dataGridViewTransactions, transactionsList);
+        }
+
+        /// <summary>
+        /// Observer registed to model
+        /// </summary>
+        /// <param name="openTransactionslist">open transactions list</param>
+        private void OpenTransactionListChanged(IList<IList<string>> openTransactionslist)
+        {
+            this.openTransactionsList = openTransactionslist;
+        }
+
+        /// <summary>
+        /// Updates a data grid view with a 2 deminsional list
+        /// </summary>
+        /// <param name="dataGridView">grid view to update</param>
+        /// <param name="lists">2 deminsional list</param>
+        private void UpdateDataGrid(DataGridView dataGridView, IList<IList<string>> lists)
+        {
+            foreach (var r in lists)
+            {
+                var row = new DataGridViewRow();
+                dataGridView.ColumnCount = r.Count;
+                for (int i = 0; i < r.Count; ++i)
+                {
+                    row.Cells.Add(new DataGridViewTextBoxCell() { Value = r[i] });
+                }
+
+                dataGridView.Rows.Add(row);
+            }
+
+            dataGridView.Update();
         }
     }
 }
