@@ -8,19 +8,6 @@
 
     public class TransactionsListReadModel : IListObservable, IListReadModel
     {
-        private readonly string transactionTableName = "Transactions";
-        private readonly string[] columnNames = 
-        { 
-            "ID", 
-            "Purchased Date", 
-            "Equity", 
-            "Quantity", 
-            "Cost Basis",
-            "Sold Date", 
-            "Market Value", 
-            "Dividends", 
-        };
-
         private IDatabase database;
         private IList<ITransaction> transactions;
         private bool refresh = true;
@@ -33,18 +20,6 @@
         }
 
         protected event ListChangedEventHandler ListChangedObserver;
-
-        private enum ColumnIndex
-        {
-            ID = 0,
-            PurchaseDate,
-            EquityName,
-            Quantity,
-            CostBasis,
-            SoldDate,
-            MarketValue,
-            Dividends,
-        }
 
         public IList<ITransaction> OpenTransactionsList
         {
@@ -88,14 +63,14 @@
             try
             {
                 string[] columns = 
-                                  { 
-                                     this.ColumnLookUp(ColumnIndex.PurchaseDate), 
-                                     this.ColumnLookUp(ColumnIndex.EquityName), 
-                                     this.ColumnLookUp(ColumnIndex.Quantity), 
-                                     this.ColumnLookUp(ColumnIndex.CostBasis) 
+                                  {
+									 TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.PurchaseDate),
+									 TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.EquityName),
+									 TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.Quantity),
+									 TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.CostBasis) 
                                    };
                 dynamic[] values = { date.ToShortDateString(), stock, quantity, cost };
-                this.database.AddRecord(this.transactionTableName, columns, values);
+                this.database.AddRecord(TransactionTableSchema.TransactionTableName, columns, values);
             }
             catch
             {
@@ -105,46 +80,52 @@
             return true;
         }
 
-        public bool Sell(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds)
-        {
-            try
-            {
-                DataTable dt = this.database.GetRows(
-                                               this.transactionTableName,
-                                               this.ColumnLookUp(ColumnIndex.ID),
-                                               rowIndex);
-                if (dt.Rows.Count != 1)
-                {
-                    throw new Exception("Error: Transaction to sell was not found!");
-                }
-                else
-                {
-                    DataRow dr = dt.Rows[0];
-                    ////List<decimal> dividends = this.GetDividend(dr[3].ToString(), this.ConvertDate(dr[1].ToString()), this.ConvertDate(dr[5].ToString()));
-                    string[] columns = { this.ColumnLookUp(ColumnIndex.SoldDate), this.ColumnLookUp(ColumnIndex.MarketValue) };
-                    dynamic[] values = { saleDate.ToShortDateString(), saleProceeds };
-                    this.database.UpdateRecord(this.transactionTableName, rowIndex, columns, values);
-                }
-            }
-            catch
-            {
-                return false;
-            }
+		public bool Sell(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds)
+		{
+			try
+			{
+				DataTable dt = this.database.GetRows(
+					TransactionTableSchema.TransactionTableName,
+					TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.ID),
+					rowIndex);
 
-            return true;
-        }
+				if (dt.Rows.Count != 1)
+				{
+					throw new Exception("Error: Transaction to sell was not found!");
+				}
+				else
+				{
+					DataRow dr = dt.Rows[0];
+					////List<decimal> dividends = this.GetDividend(dr[3].ToString(), this.ConvertDate(dr[1].ToString()), this.ConvertDate(dr[5].ToString()));
+					string[] columns = 
+					{
+						TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.SoldDate),
+						TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.MarketValue),
+					};
+
+					dynamic[] values = { saleDate.ToShortDateString(), saleProceeds };
+					this.database.UpdateRecord(TransactionTableSchema.TransactionTableName, rowIndex, columns, values);
+				}
+			}
+			catch
+			{
+				return false;
+			}
+
+			return true;
+		}
 
         public bool Split(string equitySymbol, double splitRatio)
         {
             try
             {
-                DataTable dt = this.database.GetRows(this.transactionTableName, this.ColumnLookUp(ColumnIndex.EquityName), equitySymbol);
+                DataTable dt = this.database.GetRows(TransactionTableSchema.TransactionTableName, TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.EquityName), equitySymbol);
 
-                string[] columns = { this.ColumnLookUp(ColumnIndex.Quantity) };
+                string[] columns = { TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.Quantity) };
                 foreach (var row in dt.AsEnumerable())
                 {
-                    string[] values = { (Convert.ToDouble(row[this.ColumnLookUp(ColumnIndex.Quantity)]) * splitRatio).ToString() };
-                    this.database.UpdateRecord(this.transactionTableName, Convert.ToInt32(row[this.ColumnLookUp(ColumnIndex.ID)]), columns, values);
+                    string[] values = { (Convert.ToDouble(row[TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.Quantity)]) * splitRatio).ToString() };
+                    this.database.UpdateRecord(TransactionTableSchema.TransactionTableName, Convert.ToInt32(row[TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.ID)]), columns, values);
                 }
             }
             catch
@@ -205,20 +186,20 @@
 
             try
             {
-                dt = this.database.GetTableData(this.transactionTableName);
+                dt = this.database.GetTableData(TransactionTableSchema.TransactionTableName);
 
                 foreach (DataRow row in dt.AsEnumerable())
                 {
                     TransactionHistory t = new TransactionHistory();
 
-                    t.RowID = Convert.ToInt32(row[(int)ColumnIndex.ID]);
-                    t.PurchasedDate = DataConverter.Date(row[(int)ColumnIndex.PurchaseDate].ToString());
-                    t.EquitySymbol = row[(int)ColumnIndex.EquityName].ToString();
-                    t.Quanity = Convert.ToDouble(row[(int)ColumnIndex.Quantity]);
-                    t.Cost = Convert.ToDecimal(row[(int)ColumnIndex.CostBasis]);
-                    t.SaleDate = DataConverter.Date(row[(int)ColumnIndex.SoldDate].ToString());
-                    t.SaleProceeds = DataConverter.NullableDecimal(row[(int)ColumnIndex.MarketValue].ToString());
-                    t.Dividends = DataConverter.NullableDecimal(row[(int)ColumnIndex.Dividends].ToString());
+                    t.RowID = Convert.ToInt32(row[(int)TransactionTableSchema.ColumnIndex.ID]);
+                    t.PurchasedDate = DataConverter.Date(row[(int)TransactionTableSchema.ColumnIndex.PurchaseDate].ToString());
+                    t.EquitySymbol = row[(int)TransactionTableSchema.ColumnIndex.EquityName].ToString();
+                    t.Quanity = Convert.ToDouble(row[(int)TransactionTableSchema.ColumnIndex.Quantity]);
+                    t.Cost = Convert.ToDecimal(row[(int)TransactionTableSchema.ColumnIndex.CostBasis]);
+                    t.SaleDate = DataConverter.Date(row[(int)TransactionTableSchema.ColumnIndex.SoldDate].ToString());
+                    t.SaleProceeds = DataConverter.NullableDecimal(row[(int)TransactionTableSchema.ColumnIndex.MarketValue].ToString());
+                    t.Dividends = DataConverter.NullableDecimal(row[(int)TransactionTableSchema.ColumnIndex.Dividends].ToString());
                     if (t.Dividends == null)
                     {
                         ////tx.Dividends = this.GetDividend(tx.EquitySymbol, tx.PurchasedDate, tx.SaleDate).Sum(x => x) * (decimal)tx.Quanity;
@@ -248,16 +229,6 @@
             {
                 return p1.RowID.CompareTo(p2.RowID);
             });
-        }
- 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        private string ColumnLookUp(ColumnIndex index)
-        {
-            return this.columnNames[(int)index];
         }
     }
 }
