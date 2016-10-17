@@ -91,6 +91,7 @@
     <Compile Include="Intefaces\ICurrentPositionModel.cs" />
     <Compile Include="Intefaces\IListObservable.cs" />
     <Compile Include="Intefaces\IListReadModel.cs" />
+    <Compile Include="Intefaces\ITransactionsListWriter.cs" />
     <Compile Include="Intefaces\ITransactionsView.cs" />
     <Compile Include="Intefaces\ITransaction.cs" />
     <Compile Include="Intefaces\ITransactionsModel.cs" />
@@ -129,6 +130,7 @@
     <Compile Include="Source\TransactionHistory.cs" />
     <Compile Include="Source\TransactionModelFactory.cs" />
     <Compile Include="Source\TransactionsListReadModel.cs" />
+    <Compile Include="Source\TransactionsListWriteModel.cs" />
     <Compile Include="Source\TransactionTableSchema.cs" />
     <Compile Include="Source\YahooFinance.cs" />
     <Compile Include="Forms\Main.cs">

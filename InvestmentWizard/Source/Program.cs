@@ -47,6 +47,7 @@
 			container.AddRegistration(typeof(IListReadModel), registration);
 			container.RegisterConditional(typeof(IListObservable), registration, o => o.Consumer.Target.Parameter.Name.Equals("transactionsObserver"));
 			container.RegisterConditional<IListObservable, OpenTransactionsListReadModel>(Lifestyle.Singleton, o => o.Consumer.Target.Parameter.Name.Equals("openTransactionsObserver"));
+			container.Register<ITransactionsListWriter, TransactionsListWriteModel>(Lifestyle.Singleton);
 
 			container.Register<ITransactionController, TransactionController>(Lifestyle.Singleton);
             container.Register<ICurrentPositionsModel, CurrentPositionModel>(Lifestyle.Singleton);

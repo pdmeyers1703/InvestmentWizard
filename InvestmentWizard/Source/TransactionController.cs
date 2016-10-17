@@ -15,6 +15,7 @@
         /// </summary>
         private IListObservable transactionsObserver;
         private IListObservable openTransactionsObserver;
+		private ITransactionsListWriter transactionWriter;
 		private ITransactionsView transactionView;
         private IFinancialData server;
 
@@ -27,10 +28,12 @@
 		public TransactionController(
             IListObservable transactionsObserver, 
             IListObservable openTransactionsObserver,
+			ITransactionsListWriter transactionWriter,
             IFinancialData dataServer) 
         {
 			this.transactionsObserver = transactionsObserver;
 			this.openTransactionsObserver = openTransactionsObserver;
+			this.transactionWriter = transactionWriter;
 			this.server = dataServer;
 		}
 
