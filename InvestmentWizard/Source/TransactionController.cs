@@ -2,8 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
-    using System.Linq;
 
     /// <summary>
     /// Controller for all transactions
@@ -62,7 +60,7 @@
 		}
 
 		/// <summary>
-		/// Updates the model
+		/// Updates the models
 		/// </summary>
 		public void Update()
 		{
@@ -77,10 +75,11 @@
                                             ///             b.SaleDate.Value.Year == DateTime.Now.Year).ToList();
         }
 
-        public bool AddPosition(DateTime date, string stock, double quantity, decimal cost)
-        {
-            return true; //// this.transactionsObserver.Add(date, stock, quantity, cost);
-        }
+		public void AddPosition(DateTime date, string stock, double quantity, decimal cost)
+		{
+			this.transactionWriter.Add(date, stock, quantity, cost);
+			this.Update();
+		}
 
         public bool SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds)
         {
@@ -103,9 +102,9 @@
 
 			ListChangedEventHandler openTransactionHandler;
 			this.transactionView.RegisterOpenTransactionList(out openTransactionHandler);
-			this.transactionsObserver.RegisterObserver(openTransactionHandler);
+			this.openTransactionsObserver.RegisterObserver(openTransactionHandler);
 		}
-
+													
         /// <summary>
         /// Returns all the dividend payment for an equity between a particular time range
         /// </summary>

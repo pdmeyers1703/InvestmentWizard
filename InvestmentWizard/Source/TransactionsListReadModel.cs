@@ -10,7 +10,6 @@
     {
         private IDatabase database;
         private IList<ITransaction> transactions;
-        private bool refresh = true;
 
         public TransactionsListReadModel(IDatabase database)
         {
@@ -46,17 +45,13 @@
             this.ListChangedObserver += listChangedObserver;
         }
 
-        /// <summary>
-        /// Get entire transaction table in the database if refresh is needed
-        /// </summary>
-        public virtual void Update()
-        {
-            if (this.refresh)
-            {
-                this.DoUpdate();
-                this.refresh = false;
-            }
-        }
+		/// <summary>
+		/// Get entire transaction table in the database if refresh is needed
+		/// </summary>
+		public virtual void Update()
+		{
+				this.DoUpdate();
+		}
 
         /// <summary>
         /// Fires when list changes
