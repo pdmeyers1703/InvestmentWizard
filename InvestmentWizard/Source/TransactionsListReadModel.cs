@@ -67,14 +67,15 @@
         /// </summary>
         /// <param name="trasactions"> list of transactions</param>
         /// <returns> 2 dimensional list of strings </returns>
-        protected IList<IList<string>> ToListOfListOfStrings(IList<ITransaction> trasactions)
+        protected IList<IList<string>> ToListOfListOfStrings(IList<ITransaction> transactions)
         {
             IList<IList<string>> list = new List<IList<string>>();
 
-            foreach (var row in this.transactions)
+            foreach (var row in transactions)
             {
-                List<string> columns = new List<string>
-                {
+				List<string> columns = new List<string>
+				{
+					row.RowID.ToString(),
                     row.PurchasedDate == null ? string.Empty : row.PurchasedDate.Value.ToShortDateString(),
                     row.EquitySymbol,
                     row.Quanity.ToString(),

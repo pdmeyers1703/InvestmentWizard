@@ -21,7 +21,7 @@
 
 		void AddPosition(DateTime date, string stock, double quantity, decimal cost);
 
-		bool SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds);
+		void SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds);
 
 		bool SplitPosition(string equitySymbol, double splitRatio);
 	}

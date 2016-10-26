@@ -197,48 +197,27 @@
             this.toolStripButtonSplit.Enabled = true;
         }
 
-        private void ToolStripButtonAddTransaction_Click(object sender, EventArgs e)
-        {
-            DlgBuyTransaction dlg = new DlgBuyTransaction(this.transactionController);
-            dlg.ShowDialog();
-        }
+		/// <summary>
+		/// Shows the Add transaction dialog box
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ToolStripButtonAddTransaction_Click(object sender, EventArgs e)
+		{
+			DlgBuyTransaction dlg = new DlgBuyTransaction(this.transactionController);
+			dlg.ShowDialog();
+		}
 
-        /// <summary>
-        /// Event handler for the sell transaction tool strip button.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ToolStripButtonSellTransaction_Click(object sender, EventArgs e)
-        {
-            List<string> sellComboBoxStrings = new List<string>();
-            foreach (var o in this.openTransactionsList.AsEnumerable())
-            {
-                sellComboBoxStrings.Add(o[3] + " shares of " + o[1] + " (" + o[0] + ")");
-            }
-
-            DlgSell dlg = new DlgSell(sellComboBoxStrings);
-
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                IList<string> transaction = this.openTransactionsList[dlg.SelectedSellTransaction];
-
-                if (dlg.Quantity <= Convert.ToDouble(transaction[2]))
-                {
-                    if (this.transactionController.SellPosition(dlg.SelectedSellTransaction, dlg.SaleDate, dlg.Quantity, dlg.SaleProceeds))
-                    {
-                        this.transactionController.Update();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Could not sell stock \"" + transaction[1] + "\"", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Could not sell stock \"" + transaction[1] + "\"", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
+		/// <summary>
+		/// Event handler for the sell transaction tool strip button.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ToolStripButtonSellTransaction_Click(object sender, EventArgs e)
+		{
+			DlgSell dlg = new DlgSell(this.openTransactionsList, this.transactionController);
+			dlg.ShowDialog();
+		}
 
         private void ToolStripButtonAbout_Click(object sender, EventArgs e)
         {
@@ -319,7 +298,7 @@
             {
                 var row = new DataGridViewRow();
                 dataGridView.ColumnCount = r.Count;
-                for (int i = 0; i < r.Count; ++i)
+                for (int i = 1; i < r.Count; ++i)
                 {
                     row.Cells.Add(new DataGridViewTextBoxCell() { Value = r[i] });
                 }

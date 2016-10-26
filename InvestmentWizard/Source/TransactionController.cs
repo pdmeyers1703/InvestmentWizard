@@ -81,10 +81,11 @@
 			this.Update();
 		}
 
-        public bool SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds)
-        {
-            return true; //// this.transactionsObserver.Sell(rowIndex, saleDate, quantity, saleProceeds);
-        }
+		public void SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds)
+		{
+			this.transactionWriter.Sell(rowIndex, saleDate, quantity, saleProceeds);
+			this.Update();
+		}
 
         public bool SplitPosition(string equitySymbol, double splitRatio)
         {
