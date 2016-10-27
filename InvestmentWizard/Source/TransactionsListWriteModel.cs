@@ -30,12 +30,12 @@ namespace InvestmentWizard
 		public void Add(DateTime date, string stock, double quantity, decimal cost)
 		{
 				string[] columns =
-								  {
-									 TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.PurchaseDate),
-									 TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.EquityName),
-									 TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.Quantity),
-									 TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.CostBasis)
-								   };
+				{
+					TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.PurchaseDate),
+					TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.EquityName),
+					TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.Quantity),
+					TransactionTableSchema.ColumnLookUp(TransactionTableSchema.ColumnIndex.CostBasis)
+				};
 				dynamic[] values = { date.ToShortDateString(), stock, quantity, cost };
 				this.database.AddRecord(TransactionTableSchema.TransactionTableName, columns, values);
 		}

@@ -87,10 +87,11 @@
 			this.Update();
 		}
 
-        public bool SplitPosition(string equitySymbol, double splitRatio)
-        {
-            return true;  ////this.transactionsObserver.Split(equitySymbol, splitRatio);
-        }
+		public void SplitPosition(string equitySymbol, double splitRatio)
+		{
+			this.transactionWriter.Split(equitySymbol, splitRatio);
+			this.Update();
+		}
 
 		/// <summary>
 		/// Register all view observers to the model									 

@@ -23,6 +23,6 @@
 
 		void SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds);
 
-		bool SplitPosition(string equitySymbol, double splitRatio);
+		void SplitPosition(string equitySymbol, double splitRatio);
 	}
 }

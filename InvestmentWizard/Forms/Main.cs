@@ -1,12 +1,16 @@
-﻿namespace InvestmentWizard
+﻿// <copyright file="Main.cs" company="Peter Meyers">
+//     Copyright (c) Peter Meyers. All rights reserved.
+// </copyright> System;
+
+namespace InvestmentWizard
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Data;
-    using System.Drawing;
-    using System.Linq;
-    using System.Windows.Forms;
+	using System;
+	using System.Collections.Generic;
+	using System.ComponentModel;
+	using System.Data;
+	using System.Drawing;
+	using System.Linq;
+	using System.Windows.Forms;
 
     public partial class Main : Form, ITransactionsView
 	{
@@ -219,31 +223,32 @@
 			dlg.ShowDialog();
 		}
 
-        private void ToolStripButtonAbout_Click(object sender, EventArgs e)
-        {
-            AboutBox aboutBox = new AboutBox();
-            if (DialogResult.OK == aboutBox.ShowDialog())
-            {
-                aboutBox.Close();
-            }
-        }
+		/// <summary>
+		/// Event hanlder for the split transaction tool strip button
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ToolStripButtonSplit_Click(object sender, EventArgs e)
+		{
+			DlgSplit dlg = new DlgSplit(
+				this.openTransactionsList.Select(a => a[2]).Distinct().ToList(),
+				this.transactionController);
+			dlg.ShowDialog();
+		}
 
-        private void ToolStripButtonSplit_Click(object sender, EventArgs e)
-        {
-            DlgSplit dlg = new DlgSplit(this.openTransactionsList.Select(a => a[1]).Distinct().ToList());
-
-            if (DialogResult.OK == dlg.ShowDialog())
-            {
-                if (this.transactionController.SplitPosition(dlg.SplitEquity, dlg.SplitRatio))
-                {
-                    this.transactionController.Update();
-                }
-                else
-                {
-                    MessageBox.Show("Could not split stock \"" + dlg.SplitEquity + "\"", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
+		/// <summary>
+		/// Event handler for the about diaglog box tool strip button.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ToolStripButtonAbout_Click(object sender, EventArgs e)
+		{
+			AboutBox aboutBox = new AboutBox();
+			if (DialogResult.OK == aboutBox.ShowDialog())
+			{
+				aboutBox.Close();
+			}
+		}
 
         private void ToolStripStatusLabel3_TextChanged(object sender, EventArgs e)
         {

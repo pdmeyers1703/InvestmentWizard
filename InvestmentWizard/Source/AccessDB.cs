@@ -47,6 +47,8 @@
                     {
                         adpater.Fill(dt);
                     }
+
+					conn.Close();
                 }
 
                 return dt;
@@ -95,7 +97,7 @@
                     conn.Open();
                     OleDbCommand cmd = new OleDbCommand();
                     cmd.Connection = conn;
-                    cmd.CommandText = "SELECT * FROM " + tableName + " WHERE [" + col + "]=" + criteria.ToString();
+                    cmd.CommandText = "SELECT * FROM " + tableName + " WHERE [" + col + "]='" + criteria.ToString() + "'";
                     using (OleDbDataAdapter adpater = new OleDbDataAdapter(cmd))
                     {
                         adpater.Fill(dt);
