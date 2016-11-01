@@ -15,8 +15,8 @@ namespace InvestmentWizard
 		/// <summary>
 		/// private Members
 		/// </summary>
-        private IListObservable transactionsObserver;
-        private IListObservable openTransactionsObserver;
+        private IListObservable<IList<string>> transactionsObserver;
+        private IListObservable<IList<string>> openTransactionsObserver;
 		private ITransactionsListWriter transactionWriter;
 		private ITransactionsView transactionView;
         private IFinancialData server;
@@ -28,8 +28,8 @@ namespace InvestmentWizard
 		/// <param name="openTransactionsObserver">observer for all open transactions</param>
 		/// <param name="dataServer">Data server for real-time quotes</param>
 		public TransactionController(
-		IListObservable transactionsObserver, 
-		IListObservable openTransactionsObserver,
+		IListObservable<IList<string>> transactionsObserver, 
+		IListObservable<IList<string>> openTransactionsObserver,
 		ITransactionsListWriter transactionWriter,
 		IFinancialData dataServer) 
 	{
@@ -121,11 +121,11 @@ namespace InvestmentWizard
 		/// </summary>
 		private void RegisterModelsWithView()
 		{
-			ListChangedEventHandler completeTransactionHandler;
+			ListChangedEventHandler<IList<string>> completeTransactionHandler;
 			this.transactionView.RegisterCompleteTransactionList(out completeTransactionHandler);
 			this.transactionsObserver.RegisterObserver(completeTransactionHandler);
 
-			ListChangedEventHandler openTransactionHandler;
+			ListChangedEventHandler<IList<string>> openTransactionHandler;
 			this.transactionView.RegisterOpenTransactionList(out openTransactionHandler);
 			this.openTransactionsObserver.RegisterObserver(openTransactionHandler);
 		}

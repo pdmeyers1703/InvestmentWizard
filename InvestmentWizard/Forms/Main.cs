@@ -12,41 +12,46 @@ namespace InvestmentWizard
 	using System.Linq;
 	using System.Windows.Forms;
 
-    public partial class Main : Form, ITransactionsView
+    public partial class Main : Form, ITransactionsView, ICurrentPositionsView
 	{
         private IFinancialData financialDataClient = new YahooFinancalDataClient();
-        private List<PriceQuote> prices = new List<PriceQuote>();
         private ITransactionController transactionController;
-        private ICurrentPositionsModel currentPositionsModel;
+		private ICurrentPositionsController currentPositionsController;
         private IList<IList<string>> openTransactionsList;
         
-        public Main(
-            ICurrentPositionsModel currentPositionsModel,
-            ITransactionController transactionController)
-        {
-            this.InitializeComponent();
-
-            this.transactionController = transactionController;
-			this.transactionController.TransactionView = this;
-            this.currentPositionsModel = currentPositionsModel;
-        }
-
-		/// <summary>
-		/// Passing the view handler to the controller
-		/// </summary>
-		/// <param name="handler">list change handler</param>
-		public void RegisterCompleteTransactionList(out ListChangedEventHandler handler)
+		public Main(
+			ITransactionController transactionController,
+			ICurrentPositionsController currentPositionsController)
 		{
-			handler = new ListChangedEventHandler(this.OnTransactionListChanged);
+			this.InitializeComponent();
+
+			this.transactionController = transactionController;
+			this.transactionController.TransactionView = this;
+			this.currentPositionsController = currentPositionsController;
+			this.currentPositionsController.CurrentPositionsView = this;
 		}
 
 		/// <summary>
 		/// Passing the view handler to the controller
 		/// </summary>
 		/// <param name="handler">list change handler</param>
-		public void RegisterOpenTransactionList(out ListChangedEventHandler handler)
+		public void RegisterCompleteTransactionList(out ListChangedEventHandler<IList<string>> handler)
 		{
-			handler = new ListChangedEventHandler(this.OpenTransactionListChanged);
+			handler = new ListChangedEventHandler<IList<string>>(this.OnTransactionListChanged);
+		}
+
+		/// <summary>
+		/// Passing the view handler to the controller
+		/// </summary>
+		/// <param name="handler">list change handler</param>
+		public void RegisterOpenTransactionList(out ListChangedEventHandler<IList<string>> handler)
+		{
+			handler = new ListChangedEventHandler<IList<string>>(this.OpenTransactionListChanged);
+		}
+
+		public void RegisterCurrentPositionsList(out ListChangedEventHandler<ICurrentPosition> handler)
+		{
+			handler = new ListChangedEventHandler<ICurrentPosition>(this.CurrentPositionsListChanged);
 		}
 
 		private void OnClick_UpdateQuotes(object sender, EventArgs e)
@@ -57,14 +62,12 @@ namespace InvestmentWizard
         private void Main_Load(object sender, EventArgs e)
         {
 			this.transactionController.Initialize();
+			this.currentPositionsController.Initialize();
 
             try
             {
                 this.transactionController.Update();
-                this.currentPositionsModel.UpdateList();
-                var bindinglist2 = new BindingList<IOpenPositions>(this.currentPositionsModel.CurrentPositions);
-                var source2 = new BindingSource(bindinglist2, null);
-                this.dataGridViewCurPos.DataSource = source2;
+                this.currentPositionsController.Update();
             }
             catch
             {
@@ -81,7 +84,7 @@ namespace InvestmentWizard
             Cursor.Current = Cursors.WaitCursor;
             try
             {
-                this.currentPositionsModel.Update();
+                this.currentPositionsController.Update();
                 ////this.openPositions.BuildTotals();
                
                 PriceQuote sp500 = this.GetSP500Quote();
@@ -184,12 +187,8 @@ namespace InvestmentWizard
             this.toolStripButtonSellTransaction.Enabled = false;
             this.toolStripButtonSplit.Enabled = false;
             
-            this.currentPositionsModel.UpdateList();
-            this.UpdateCurrentPositionsDataGridViewQuotes();
-            var bindinglist = new BindingList<IOpenPositions>(this.currentPositionsModel.CurrentPositions);
-            var source = new BindingSource(bindinglist, null);
-            this.dataGridViewCurPos.DataSource = source;
-            
+            this.currentPositionsController.Update();
+            this.UpdateCurrentPositionsDataGridViewQuotes();            
             Cursor.Current = Cursors.Default;
         }
 
@@ -284,13 +283,29 @@ namespace InvestmentWizard
         }
 
         /// <summary>
-        /// Observer registed to model
+        /// Observer registered to model
         /// </summary>
-        /// <param name="openTransactionslist">open </param>
+        /// <param name="openTransactionslist">Open transactions list.</param>
         private void OpenTransactionListChanged(IList<IList<string>> openTransactionslist)
         {
             this.openTransactionsList = openTransactionslist;
         }
+
+		/// <summary>
+		/// Observer registered to model
+		/// </summary>
+		/// <param name="currentPositions">Current poistion list</param>
+		private void CurrentPositionsListChanged(IList<ICurrentPosition> currentPositions)
+		{
+			IList<IList<string>> displayableList = new List<IList<string>>();
+
+			foreach (var position in currentPositions)
+			{
+				displayableList.Add(position.ToStringList());
+			}
+
+			this.UpdateDataGrid(this.dataGridViewCurPos, displayableList);
+		}
 
         /// <summary>
         /// Updates a data grid view with a 2 deminsional list

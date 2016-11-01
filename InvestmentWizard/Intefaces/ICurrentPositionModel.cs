@@ -8,12 +8,12 @@
 
     public interface ICurrentPositionsModel
     {
-        List<IOpenPositions> CurrentPositions { get; }
+        List<ICurrentPosition> CurrentPositions { get; }
 
         void UpdateList();
 
         void Update();
 
-        void BuildTotals();
+        ////void BuildTotals();
     }
 }

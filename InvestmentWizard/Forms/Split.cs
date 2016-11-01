@@ -1,6 +1,6 @@
 ﻿// <copyright file="Split.cs" company="Peter Meyers">
 //     Copyright (c) Peter Meyers. All rights reserved.
-// </copyright> System;
+// </copyright>
 
 namespace InvestmentWizard
 {

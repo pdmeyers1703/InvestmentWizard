@@ -6,7 +6,7 @@
     using System.Diagnostics;
     using System.Linq;
 
-    public class TransactionsListReadModel : IListObservable, IListReadModel
+    public class TransactionsListReadModel : IListObservable<IList<string>>, IListReadModel
     {
         private IDatabase database;
         private IList<ITransaction> transactions;
@@ -18,7 +18,7 @@
             this.transactions = new List<ITransaction>();
         }
 
-        protected event ListChangedEventHandler ListChangedObserver;
+        protected event ListChangedEventHandler<IList<string>> ListChangedObserver;
 
         public IList<ITransaction> OpenTransactionsList
         {
@@ -40,7 +40,7 @@
         /// Register observers for this model
         /// </summary>
         /// <param name="listChangedObserver">event handler</param>
-        public void RegisterObserver(ListChangedEventHandler listChangedObserver)
+        public void RegisterObserver(ListChangedEventHandler<IList<string>> listChangedObserver)
         {
             this.ListChangedObserver += listChangedObserver;
         }
