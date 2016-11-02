@@ -45,8 +45,8 @@
 
 			var registration = Lifestyle.Singleton.CreateRegistration<TransactionsListReadModel>(container);
 			container.AddRegistration(typeof(IListReadModel), registration);
-			container.RegisterConditional(typeof(IListObservable<IList<string>>), registration, o => o.Consumer.Target.Parameter.Name.Equals("transactionsObserver"));
-			container.RegisterConditional<IListObservable<IList<string>>, OpenTransactionsListReadModel>(Lifestyle.Singleton, o => o.Consumer.Target.Parameter.Name.Equals("openTransactionsObserver"));
+			container.RegisterConditional(typeof(IListObservable<ITransaction>), registration, o => o.Consumer.Target.Parameter.Name.Equals("transactionsObserver"));
+			container.RegisterConditional<IListObservable<ITransaction>, OpenTransactionsListReadModel>(Lifestyle.Singleton, o => o.Consumer.Target.Parameter.Name.Equals("openTransactionsObserver"));
 			container.Register<ITransactionsListWriter, TransactionsListWriteModel>(Lifestyle.Singleton);
 			container.Register<IListObservable<ICurrentPosition>, CurrentPositionModel>(Lifestyle.Singleton);
 

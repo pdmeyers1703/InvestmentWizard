@@ -11,12 +11,12 @@
 		/// Passing the view handler to the controller
 		/// </summary>
 		/// <param name="handler">list change handler</param>
-		void RegisterCompleteTransactionList(out ListChangedEventHandler<IList<string>> handler);
+		void RegisterCompleteTransactionList(out ListChangedEventHandler<ITransaction> handler);
 
 		/// <summary>
 		/// Passing the view handlers to the controller
 		/// </summary>
 		/// <param name="handler"></param>
-		void RegisterOpenTransactionList(out ListChangedEventHandler<IList<string>> handler);
+		void RegisterOpenTransactionList(out ListChangedEventHandler<ITransaction> handler);
 	}
 }

@@ -6,7 +6,7 @@
     using System.Diagnostics;
     using System.Linq;
 
-    public class TransactionsListReadModel : IListObservable<IList<string>>, IListReadModel
+    public class TransactionsListReadModel : IListObservable<ITransaction>, IListReadModel
     {
         private IDatabase database;
         private IList<ITransaction> transactions;
@@ -18,7 +18,7 @@
             this.transactions = new List<ITransaction>();
         }
 
-        protected event ListChangedEventHandler<IList<string>> ListChangedObserver;
+        protected event ListChangedEventHandler<ITransaction> ListChangedObserver;
 
         public IList<ITransaction> OpenTransactionsList
         {
@@ -40,7 +40,7 @@
         /// Register observers for this model
         /// </summary>
         /// <param name="listChangedObserver">event handler</param>
-        public void RegisterObserver(ListChangedEventHandler<IList<string>> listChangedObserver)
+        public void RegisterObserver(ListChangedEventHandler<ITransaction> listChangedObserver)
         {
             this.ListChangedObserver += listChangedObserver;
         }
@@ -57,7 +57,7 @@
         /// Fires when list changes
         /// </summary>
         /// <param name="list">2 dimensional list of strings</param>
-        protected void OnListChanged(IList<IList<string>> list)
+        protected void OnListChanged(IList<ITransaction> list)
         {
             this.ListChangedObserver(list);
         }
@@ -108,7 +108,7 @@
 
                 foreach (DataRow row in dt.AsEnumerable())
                 {
-                    TransactionHistory t = new TransactionHistory();
+                    Transaction t = new Transaction();
 
                     t.RowID = Convert.ToInt32(row[(int)TransactionTableSchema.ColumnIndex.ID]);
                     t.PurchasedDate = DataConverter.Date(row[(int)TransactionTableSchema.ColumnIndex.PurchaseDate].ToString());
@@ -128,7 +128,7 @@
 
                 this.SortByRowID((List<ITransaction>)this.transactions);
 
-                this.OnListChanged(this.ToListOfListOfStrings((IList<ITransaction>)this.transactions) as IList<IList<string>>);
+                this.OnListChanged(this.transactions);
             }
             catch
             {

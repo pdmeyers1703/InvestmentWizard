@@ -1,6 +1,7 @@
 ﻿namespace InvestmentWizard
 {
     using System;
+	using System.Collections.Generic;
 
     public interface ITransaction
     {
@@ -23,5 +24,7 @@
         decimal? SaleProceeds { get; set; }
          
         decimal? Dividends { get; set; }
-    }
+
+		IList<string> ToStringList();
+	}
 }

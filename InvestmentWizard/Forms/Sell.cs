@@ -6,12 +6,13 @@ namespace InvestmentWizard
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using System.Windows.Forms;
 
 	public partial class DlgSell : Form
-	{
+	{				   
 		private ITransactionController transactionController;
-		private IList<IList<string>> openTransactions;
+		private IEnumerable<ITransaction> openTransactions;
 
 		/// <summary>
 		/// Default Constructor
@@ -25,14 +26,14 @@ namespace InvestmentWizard
 		/// Constructor that initializes a combo box.
 		/// </summary>
 		/// <param name="currentHoldings">items to fill combo box</param>
-		public DlgSell(IList<IList<string>> openTransactions, ITransactionController transactionController) : this()
+		public DlgSell(IEnumerable<ITransaction> openTransactions, ITransactionController transactionController) : this()
 		{
 			this.transactionController = transactionController;
 			this.openTransactions = openTransactions;
 
 			foreach (var t in this.openTransactions)
 			{
-				this.comboBoxSell.Items.Add(t[3] + " shares of " + t[2] + " (" + t[1] + ")");
+				this.comboBoxSell.Items.Add(t.Quanity + " shares of " + t.EquitySymbol + " (" + t.PurchasedDate + ")");
 			}
 		}
 
@@ -62,9 +63,9 @@ namespace InvestmentWizard
 				{
 					if (DialogResult.Yes == MessageBox.Show("Are you sure you would like to sell this position?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
 					{
-						IList<string> selectedItem = this.openTransactions[this.comboBoxSell.SelectedIndex];
+						ITransaction selectedItem = this.openTransactions.ElementAt(this.comboBoxSell.SelectedIndex);
 						this.transactionController.SellPosition(
-							Convert.ToInt32(selectedItem[0]), 
+							Convert.ToInt32(selectedItem.RowID), 
 							this.datePicker.Value, 
 							Convert.ToDouble(this.textBoxQuantity.Text), 
 							Convert.ToDecimal(this.textBoxSalesProceeds.Text));

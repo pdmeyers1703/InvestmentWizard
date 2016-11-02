@@ -13,7 +13,7 @@
         {
 			base.Update();
             IList<ITransaction> openTransactions = this.Transactions.Where(t => t.SaleDate == null).ToList();
-            this.OnListChanged(this.ToListOfListOfStrings(openTransactions));
+            this.OnListChanged(openTransactions);
         }
     }
 }
