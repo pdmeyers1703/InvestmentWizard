@@ -130,7 +130,7 @@
       <DependentUpon>Sell.cs</DependentUpon>
     </Compile>
     <Compile Include="Source\TransactionController.cs" />
-    <Compile Include="Source\TransactionHistory.cs" />
+    <Compile Include="Source\Transaction.cs" />
     <Compile Include="Source\TransactionModelFactory.cs" />
     <Compile Include="Source\TransactionsListReadModel.cs" />
     <Compile Include="Source\TransactionsListWriteModel.cs" />

@@ -17,7 +17,7 @@ namespace InvestmentWizard
         private IFinancialData financialDataClient = new YahooFinancalDataClient();
         private ITransactionController transactionController;
 		private ICurrentPositionsController currentPositionsController;
-        private IList<IList<string>> openTransactionsList;
+        private IList<ITransaction> openTransactionsList;
         
 		public Main(
 			ITransactionController transactionController,
@@ -35,18 +35,18 @@ namespace InvestmentWizard
 		/// Passing the view handler to the controller
 		/// </summary>
 		/// <param name="handler">list change handler</param>
-		public void RegisterCompleteTransactionList(out ListChangedEventHandler<IList<string>> handler)
+		public void RegisterCompleteTransactionList(out ListChangedEventHandler<ITransaction> handler)
 		{
-			handler = new ListChangedEventHandler<IList<string>>(this.OnTransactionListChanged);
+			handler = new ListChangedEventHandler<ITransaction>(this.OnTransactionListChanged);
 		}
 
 		/// <summary>
 		/// Passing the view handler to the controller
 		/// </summary>
 		/// <param name="handler">list change handler</param>
-		public void RegisterOpenTransactionList(out ListChangedEventHandler<IList<string>> handler)
+		public void RegisterOpenTransactionList(out ListChangedEventHandler<ITransaction> handler)
 		{
-			handler = new ListChangedEventHandler<IList<string>>(this.OpenTransactionListChanged);
+			handler = new ListChangedEventHandler<ITransaction>(this.OpenTransactionListChanged);
 		}
 
 		public void RegisterCurrentPositionsList(out ListChangedEventHandler<ICurrentPosition> handler)
@@ -230,7 +230,7 @@ namespace InvestmentWizard
 		private void ToolStripButtonSplit_Click(object sender, EventArgs e)
 		{
 			DlgSplit dlg = new DlgSplit(
-				this.openTransactionsList.Select(a => a[2]).Distinct().ToList(),
+				this.openTransactionsList.Select(a => a.EquitySymbol).Distinct().ToList(),
 				this.transactionController);
 			dlg.ShowDialog();
 		}
@@ -273,20 +273,27 @@ namespace InvestmentWizard
             }
         }
 
-        /// <summary>
-        /// Observer registered to model
-        /// </summary>
-        /// <param name="transactionsList">transactions list</param>
-        private void OnTransactionListChanged(IList<IList<string>> transactionsList)
-        {
-            this.UpdateDataGrid(this.dataGridViewTransactions, transactionsList);
-        }
+		/// <summary>
+		/// Observer registered to model
+		/// </summary>
+		/// <param name="transactionsList">transactions list</param>
+		private void OnTransactionListChanged(IList<ITransaction> transactionsList)
+		{
+			IList<IList<string>> displayableList = new List<IList<string>>();
+
+			foreach (var transaction in transactionsList)
+			{
+				displayableList.Add(transaction.ToStringList());
+			}
+
+			this.UpdateDataGrid(this.dataGridViewTransactions, displayableList);
+		}
 
         /// <summary>
         /// Observer registered to model
         /// </summary>
         /// <param name="openTransactionslist">Open transactions list.</param>
-        private void OpenTransactionListChanged(IList<IList<string>> openTransactionslist)
+        private void OpenTransactionListChanged(IList<ITransaction> openTransactionslist)
         {
             this.openTransactionsList = openTransactionslist;
         }
@@ -318,7 +325,7 @@ namespace InvestmentWizard
             {
                 var row = new DataGridViewRow();
                 dataGridView.ColumnCount = r.Count;
-                for (int i = 1; i < r.Count; ++i)
+                for (int i = 0; i < r.Count; ++i)
                 {
                     row.Cells.Add(new DataGridViewTextBoxCell() { Value = r[i] });
                 }
