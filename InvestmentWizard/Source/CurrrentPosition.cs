@@ -149,15 +149,15 @@ namespace InvestmentWizard
 		{
 			List<string> list = new List<string>();
 			list.Add(this.StockTicker);
+			list.Add(this.CurrentPrice.ToString());
+			list.Add(this.PriceChange);
+			list.Add(this.PriceChangePercent);
+			list.Add(this.YtdPercentGainLoss.ToString()); 
 			list.Add(this.Quantity.ToString());
 			list.Add(this.Cost.ToString());
 			list.Add(this.CurrentMarketValue.ToString());
 			list.Add(this.GainLoss.ToString());
 			list.Add(this.PercentGainLoss.ToString());
-			list.Add(this.CurrentPrice.ToString());
-			list.Add(this.PriceChange);
-			list.Add(this.PriceChangePercent);
-
 			return list;
 		}
 	}

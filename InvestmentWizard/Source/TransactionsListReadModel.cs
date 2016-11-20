@@ -6,7 +6,7 @@
     using System.Diagnostics;
     using System.Linq;
 
-    public class TransactionsListReadModel : IListObservable<ITransaction>, IListReadModel
+    public class TransactionsListReadModel : IListObservable<ITransaction>
     {
         private IDatabase database;
         private IList<ITransaction> transactions;
@@ -19,14 +19,6 @@
         }
 
         protected event ListChangedEventHandler<ITransaction> ListChangedObserver;
-
-        public IList<ITransaction> OpenTransactionsList
-        {
-            get
-            {
-                return this.transactions.Where(t => t.SaleDate == null).ToList();
-            }
-        }
 
         protected IList<ITransaction> Transactions
         {
@@ -51,16 +43,20 @@
 		public virtual void Update()
 		{
 				this.DoUpdate();
+			this.OnListChanged(this.transactions);
 		}
 
-        /// <summary>
-        /// Fires when list changes
-        /// </summary>
-        /// <param name="list">2 dimensional list of strings</param>
-        protected void OnListChanged(IList<ITransaction> list)
-        {
-            this.ListChangedObserver(list);
-        }
+		/// <summary>
+		/// Fires to all subscribers when list changes.
+		/// </summary>
+		/// <param name="list">A list of transactions.</param>
+		protected void OnListChanged(IList<ITransaction> list)
+		{
+			foreach (var observer in this.ListChangedObserver.GetInvocationList())
+			{
+				observer.DynamicInvoke(list);
+			}
+	}
 
         /// <summary>
         /// Converts a list of transactions to string for displayablity 
@@ -96,7 +92,7 @@
         /// <summary>
         /// Get entire transaction table in the database
         /// </summary>
-        private void DoUpdate()
+        protected void DoUpdate()
         {
             DataTable dt = new DataTable();
 
@@ -127,8 +123,6 @@
                 }
 
                 this.SortByRowID((List<ITransaction>)this.transactions);
-
-                this.OnListChanged(this.transactions);
             }
             catch
             {

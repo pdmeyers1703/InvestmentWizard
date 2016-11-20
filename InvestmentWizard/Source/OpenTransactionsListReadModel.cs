@@ -11,7 +11,7 @@
 
         public override void Update()
         {
-			base.Update();
+			this.DoUpdate();
             IList<ITransaction> openTransactions = this.Transactions.Where(t => t.SaleDate == null).ToList();
             this.OnListChanged(openTransactions);
         }

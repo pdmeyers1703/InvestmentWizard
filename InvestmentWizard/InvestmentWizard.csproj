@@ -90,9 +90,8 @@
     <Compile Include="Intefaces\ICurrentPositionsController.cs" />
     <Compile Include="Intefaces\ICurrentPositionsView.cs" />
     <Compile Include="Intefaces\IDatabase.cs" />
-    <Compile Include="Intefaces\ICurrentPositionModel.cs" />
     <Compile Include="Intefaces\IListObservable.cs" />
-    <Compile Include="Intefaces\IListReadModel.cs" />
+    <Compile Include="Intefaces\IObserver.cs" />
     <Compile Include="Intefaces\ITransactionsListWriter.cs" />
     <Compile Include="Intefaces\ITransactionsView.cs" />
     <Compile Include="Intefaces\ITransaction.cs" />

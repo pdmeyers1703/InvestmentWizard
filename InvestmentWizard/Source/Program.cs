@@ -44,14 +44,18 @@
             container.Register<IFinancialData, YahooFinancalDataClient>(Lifestyle.Singleton);
 
 			var registration = Lifestyle.Singleton.CreateRegistration<TransactionsListReadModel>(container);
-			container.AddRegistration(typeof(IListReadModel), registration);
 			container.RegisterConditional(typeof(IListObservable<ITransaction>), registration, o => o.Consumer.Target.Parameter.Name.Equals("transactionsObserver"));
 			container.RegisterConditional<IListObservable<ITransaction>, OpenTransactionsListReadModel>(Lifestyle.Singleton, o => o.Consumer.Target.Parameter.Name.Equals("openTransactionsObserver"));
 			container.Register<ITransactionsListWriter, TransactionsListWriteModel>(Lifestyle.Singleton);
-			container.Register<IListObservable<ICurrentPosition>, CurrentPositionModel>(Lifestyle.Singleton);
+
+			var currentpositionsModelRegistration = Lifestyle.Singleton.CreateRegistration<CurrentPositionModel>(container);
+			container.AddRegistration(typeof(IListObservable<ICurrentPosition>), currentpositionsModelRegistration);
+			container.AddRegistration(typeof(IObserver<ITransaction>), currentpositionsModelRegistration);
 
 			container.Register<ITransactionController, TransactionController>(Lifestyle.Singleton);
-			container.Register<ICurrentPositionsController, CurrentPositionsController>(Lifestyle.Singleton);
+
+			var currentPositionControllerRegistration = Lifestyle.Singleton.CreateRegistration<CurrentPositionsController>(container);
+			container.AddRegistration(typeof(ICurrentPositionsController), currentPositionControllerRegistration);
 
 			var mainRegistration = Lifestyle.Singleton.CreateRegistration<Main>(container);
 			container.AddRegistration(typeof(ITransactionsView), mainRegistration);

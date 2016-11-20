@@ -6,9 +6,7 @@ namespace InvestmentWizard
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Linq;
-	using System.Text;
-	using System.Threading.Tasks;
+	using System.Diagnostics;
 
 	/// <summary>
 	/// Controller for the OpenPosition datagrid view.
@@ -17,19 +15,21 @@ namespace InvestmentWizard
 	{
 		private IListObservable<ICurrentPosition> currentPositionObserver;
 		private ICurrentPositionsView currentPositionsView;
+		private IListObservable<ITransaction> openTransactionsObserver;
+		private IObserver<ITransaction> currentpositionsObservableModel;
 
 		/// <summary>
 		/// Constuctor that takes an observer.
 		/// </summary>
 		/// <param name="currentPositionObserver">Observer of current positions model</param>
-		public CurrentPositionsController(IListObservable<ICurrentPosition> currentPositionObserver)
+		public CurrentPositionsController(
+			IListObservable<ICurrentPosition> currentPositionObserver, 
+			IListObservable<ITransaction> openTransactionsObserver,
+			IObserver<ITransaction> currentpositionsObservableModel)
 		{
 			this.currentPositionObserver = currentPositionObserver;
-
-			if (this.currentPositionObserver == null)
-			{
-				throw new ArgumentNullException("Current Position Observer is null in Current Position Controller.");
-			}
+			this.openTransactionsObserver = openTransactionsObserver;
+			this.currentpositionsObservableModel = currentpositionsObservableModel;
 		}
 
 		/// <summary>
@@ -56,6 +56,10 @@ namespace InvestmentWizard
 				this.currentPositionsView.RegisterCurrentPositionsList(out listChangeEventHander);
 				this.currentPositionObserver.RegisterObserver(listChangeEventHander);
 			}
+
+			ListChangedEventHandler<ITransaction> openTransactionsEventHandler = 
+				this.currentpositionsObservableModel.GetObserverEventHandler();
+			this.openTransactionsObserver.RegisterObserver(openTransactionsEventHandler);
 		}
 
 		/// <summary>

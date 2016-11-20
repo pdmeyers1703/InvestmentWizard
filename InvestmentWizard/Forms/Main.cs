@@ -321,7 +321,9 @@ namespace InvestmentWizard
         /// <param name="lists">2 deminsional list</param>
         private void UpdateDataGrid(DataGridView dataGridView, IList<IList<string>> lists)
         {
-            foreach (var r in lists)
+			dataGridView.Rows.Clear();
+
+			foreach (var r in lists)
             {
                 var row = new DataGridViewRow();
                 dataGridView.ColumnCount = r.Count;
