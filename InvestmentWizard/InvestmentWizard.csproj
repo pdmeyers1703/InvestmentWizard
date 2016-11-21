@@ -104,6 +104,7 @@
     <Compile Include="Forms\AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="Intefaces\IViewFormatter.cs" />
     <Compile Include="Source\AccessDB.cs" />
     <Compile Include="Intefaces\IFinanceData.cs" />
     <Compile Include="Forms\Buy.cs">
@@ -119,6 +120,7 @@
     <Compile Include="Source\DateTimeHelper.cs" />
     <Compile Include="Source\CurrentPositionModel.cs" />
     <Compile Include="Source\CurrrentPosition.cs" />
+    <Compile Include="Source\CurrentPositionsViewFormatter.cs" />
     <Compile Include="Source\OpenPositionTotals.cs" />
     <Compile Include="Source\OpenTransactionsListReadModel.cs" />
     <Compile Include="Source\PriceQuote.cs" />

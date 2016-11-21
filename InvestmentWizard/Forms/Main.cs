@@ -308,7 +308,6 @@ namespace InvestmentWizard
 
 			foreach (var position in currentPositions)
 			{
-				displayableList.Add(position.ToStringList());
 			}
 
 			this.UpdateDataGrid(this.dataGridViewCurPos, displayableList);
