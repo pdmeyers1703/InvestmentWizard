@@ -304,10 +304,12 @@ namespace InvestmentWizard
 		/// <param name="currentPositions">Current poistion list</param>
 		private void CurrentPositionsListChanged(IList<ICurrentPosition> currentPositions)
 		{
+			IViewFormatter<ICurrentPosition, List<string>> formatter = new CurrentPositionsViewFormatter();
 			IList<IList<string>> displayableList = new List<IList<string>>();
 
 			foreach (var position in currentPositions)
 			{
+				displayableList.Add(formatter.FormatData(position));
 			}
 
 			this.UpdateDataGrid(this.dataGridViewCurPos, displayableList);
