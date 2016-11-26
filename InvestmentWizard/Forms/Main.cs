@@ -18,10 +18,12 @@ namespace InvestmentWizard
         private ITransactionController transactionController;
 		private ICurrentPositionsController currentPositionsController;
         private IList<ITransaction> openTransactionsList;
+		private IViewFormatter<ICurrentPosition, List<string>> currentpositionsFormatter;
         
 		public Main(
 			ITransactionController transactionController,
-			ICurrentPositionsController currentPositionsController)
+			ICurrentPositionsController currentPositionsController,
+			IViewFormatter<ICurrentPosition, List<string>> currentpositionsFormatter)
 		{
 			this.InitializeComponent();
 
@@ -29,6 +31,8 @@ namespace InvestmentWizard
 			this.transactionController.TransactionView = this;
 			this.currentPositionsController = currentPositionsController;
 			this.currentPositionsController.CurrentPositionsView = this;
+
+			this.currentpositionsFormatter = currentpositionsFormatter;
 		}
 
 		/// <summary>
@@ -129,55 +133,24 @@ namespace InvestmentWizard
             return price;
         }
 
-        /// <summary>
-        /// Determines if certain columns should have green or red text
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DataGridViewCurPos_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            string col = this.dataGridViewCurPos.Columns[e.ColumnIndex].Name;
-            double value = 0;
+		/// <summary>
+		/// Determines if certain columns should have green or red text
+		/// </summary>
+		/// <param name="sender">sender object.</param>
+		/// <param name="e">Event argument.</param>
+		private void DataGridViewCurPos_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+		{
+			string col = this.dataGridViewCurPos.Columns[e.ColumnIndex].Name;
 
-            if ((col == "gainLoss") ||
-                (col == "percentGainLoss") ||
-                (col == "priceChange") ||
-                (col == "YtdPercentGainLoss"))
-            {
-                try
-                {
-                    value = Convert.ToDouble(e.Value);
-                }
-                catch
-                {
-                    value = 0;
-                }
-            }
-            else if (col == "PriceChangePercent")
-            {
-                try
-                {
-                    value = Convert.ToDouble((e.Value as string).Replace("%", string.Empty));
-                }
-                catch
-                {
-                    value = 0;
-                }
-            }
-            else
-            {
-                return;
-            }
-
-            if (value >= 0)
-            {
-                e.CellStyle.ForeColor = Color.Green;
-            }
-            else
-            {
-                e.CellStyle.ForeColor = Color.Red;
-            }
-        }
+			if (col == "gainLoss" ||
+				col == "priceChange" |
+				col == "PriceChangePercent" ||
+				col == "YtdPercentGainLoss" ||
+				col == "percentGainLoss")
+			{
+				e.CellStyle.ForeColor = this.currentpositionsFormatter.GetCellColor(e.Value as string);
+			}
+		}
 
         private void TabPageCurrentOpenPositions_Enter(object sender, EventArgs e)
         {
