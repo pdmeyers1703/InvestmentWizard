@@ -23,7 +23,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationRevision>3</ApplicationRevision>
     <ApplicationVersion>0.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -87,11 +87,16 @@
     <Compile Include="Forms\Split.Designer.cs">
       <DependentUpon>Split.cs</DependentUpon>
     </Compile>
+    <Compile Include="Intefaces\ICurrentPositionsController.cs" />
+    <Compile Include="Intefaces\ICurrentPositionsView.cs" />
     <Compile Include="Intefaces\IDatabase.cs" />
-    <Compile Include="Intefaces\ICurrentPositionModel.cs" />
+    <Compile Include="Intefaces\IListObservable.cs" />
+    <Compile Include="Intefaces\IObserver.cs" />
+    <Compile Include="Intefaces\ITransactionsListWriter.cs" />
+    <Compile Include="Intefaces\ITransactionsView.cs" />
     <Compile Include="Intefaces\ITransaction.cs" />
     <Compile Include="Intefaces\ITransactionsModel.cs" />
-    <Compile Include="Intefaces\IOpenPositions.cs" />
+    <Compile Include="Intefaces\ICurrentPosition.cs" />
     <Compile Include="Intefaces\ITransactionController.cs" />
     <Compile Include="Forms\AboutBox.cs">
       <SubType>Form</SubType>
@@ -99,6 +104,7 @@
     <Compile Include="Forms\AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="Intefaces\IViewFormatter.cs" />
     <Compile Include="Source\AccessDB.cs" />
     <Compile Include="Intefaces\IFinanceData.cs" />
     <Compile Include="Forms\Buy.cs">
@@ -107,13 +113,16 @@
     <Compile Include="Forms\Buy.Designer.cs">
       <DependentUpon>Buy.cs</DependentUpon>
     </Compile>
+    <Compile Include="Source\CurrentPositionsController.cs" />
     <Compile Include="Source\DatabaseFactory.cs" />
     <Compile Include="Source\DataConverter.cs" />
     <Compile Include="Source\DataGridViewFormatter.cs" />
     <Compile Include="Source\DateTimeHelper.cs" />
     <Compile Include="Source\CurrentPositionModel.cs" />
-    <Compile Include="Source\OpenPositions.cs" />
+    <Compile Include="Source\CurrrentPosition.cs" />
+    <Compile Include="Source\CurrentPositionsViewFormatter.cs" />
     <Compile Include="Source\OpenPositionTotals.cs" />
+    <Compile Include="Source\OpenTransactionsListReadModel.cs" />
     <Compile Include="Source\PriceQuote.cs" />
     <Compile Include="Forms\Sell.cs">
       <SubType>Form</SubType>
@@ -122,9 +131,11 @@
       <DependentUpon>Sell.cs</DependentUpon>
     </Compile>
     <Compile Include="Source\TransactionController.cs" />
-    <Compile Include="Source\TransactionHistory.cs" />
+    <Compile Include="Source\Transaction.cs" />
     <Compile Include="Source\TransactionModelFactory.cs" />
-    <Compile Include="Source\TransactionsModel.cs" />
+    <Compile Include="Source\TransactionsListReadModel.cs" />
+    <Compile Include="Source\TransactionsListWriteModel.cs" />
+    <Compile Include="Source\TransactionTableSchema.cs" />
     <Compile Include="Source\YahooFinance.cs" />
     <Compile Include="Forms\Main.cs">
       <SubType>Form</SubType>

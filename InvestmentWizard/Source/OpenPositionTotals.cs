@@ -6,7 +6,7 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class OpenPositionTotals : IOpenPositions
+    public class OpenPositionTotals
     {
         private string averagePriceChangePercent;
 

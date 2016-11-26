@@ -42,11 +42,26 @@
 
             container.Register<IDatabase>(() => DatabaseFactory.Create(new AccessDB()), Lifestyle.Singleton);
             container.Register<IFinancialData, YahooFinancalDataClient>(Lifestyle.Singleton);
-            container.Register<ITransactionsModel, TransactionsModel>(Lifestyle.Singleton);
-            container.Register<ICurrentPositionsModel, CurrentPositionModel>(Lifestyle.Singleton);
-            container.Register<Main>(Lifestyle.Singleton);
 
-            container.Verify();
+			var registration = Lifestyle.Singleton.CreateRegistration<TransactionsListReadModel>(container);
+			container.RegisterConditional(typeof(IListObservable<ITransaction>), registration, o => o.Consumer.Target.Parameter.Name.Equals("transactionsObserver"));
+			container.RegisterConditional<IListObservable<ITransaction>, OpenTransactionsListReadModel>(Lifestyle.Singleton, o => o.Consumer.Target.Parameter.Name.Equals("openTransactionsObserver"));
+			container.Register<ITransactionsListWriter, TransactionsListWriteModel>(Lifestyle.Singleton);
+
+			var currentpositionsModelRegistration = Lifestyle.Singleton.CreateRegistration<CurrentPositionModel>(container);
+			container.AddRegistration(typeof(IListObservable<ICurrentPosition>), currentpositionsModelRegistration);
+			container.AddRegistration(typeof(IObserver<ITransaction>), currentpositionsModelRegistration);
+
+			container.Register<ITransactionController, TransactionController>(Lifestyle.Singleton);
+
+			var currentPositionControllerRegistration = Lifestyle.Singleton.CreateRegistration<CurrentPositionsController>(container);
+			container.AddRegistration(typeof(ICurrentPositionsController), currentPositionControllerRegistration);
+
+			var mainRegistration = Lifestyle.Singleton.CreateRegistration<Main>(container);
+			container.AddRegistration(typeof(ITransactionsView), mainRegistration);
+			container.AddRegistration(typeof(ICurrentPositionsView), mainRegistration);
+
+			container.Verify();
         }
     }
 }

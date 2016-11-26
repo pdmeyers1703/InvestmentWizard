@@ -1,121 +1,157 @@
-﻿namespace InvestmentWizard
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Data;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
+﻿// <copyright file="TransactionController.cs" company="Peter Meyers">
+//     Copyright (c) Peter Meyers. All rights reserved.
+// </copyright>
 
-    public class TransactionController : ITransactionController
-    {
-        /// <summary>
-        /// private Members
-        /// </summary>
-        private ITransactionsModel transactionsModel;
+namespace InvestmentWizard
+{
+	using System;
+	using System.Collections.Generic;
+
+	/// <summary>
+	/// Controller for all transactions
+	/// </summary>
+	public class TransactionController : ITransactionController
+	{
+		/// <summary>
+		/// private Members
+		/// </summary>
+        private IListObservable<ITransaction> transactionsObserver;
+        private IListObservable<ITransaction> openTransactionsObserver;
+		private ITransactionsListWriter transactionWriter;
+		private ITransactionsView transactionView;
         private IFinancialData server;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="transactionsDB">transactions model</param>
-        /// <param name="dataServer">Data server for real-time quotes</param>
-        public TransactionController(ITransactionsModel transactionsModel, IFinancialData dataServer) 
-        {
-            if (transactionsModel == null)
-            {
-                throw new ArgumentNullException("Database refernce is Null");
-            }
-            else
-            {
-                this.transactionsModel = transactionsModel;
-            }
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="transactionsObserver">observer for entire transactions list </param>
+		/// <param name="openTransactionsObserver">observer for all open transactions</param>
+		/// <param name="dataServer">Data server for real-time quotes</param>
+		public TransactionController(
+		IListObservable<ITransaction> transactionsObserver, 
+		IListObservable<ITransaction> openTransactionsObserver,
+		ITransactionsListWriter transactionWriter,
+		IFinancialData dataServer) 
+	{
+			this.transactionsObserver = transactionsObserver;
+			this.openTransactionsObserver = openTransactionsObserver;
+			this.transactionWriter = transactionWriter;
+			this.server = dataServer;
+		}
 
-            if (dataServer == null)
-            {
-                throw new ArgumentException("Data Server reference is NULL");
-            }
-            else
-            {
-                this.server = dataServer;
-            }
-        }
+		/// <summary>
+		/// Sets the view for the controller
+		/// </summary>
+		public ITransactionsView TransactionView
+		{
+			get
+			{
+				return this.transactionView;
+			}
 
-        public List<ITransaction> History
-        {
-            get
-            {
-                return this.transactionsModel.Transactions.OrderByDescending(a => a.PurchasedDate).Reverse().ToList();
-            }
+			set
+			{
+				this.transactionView = value;
+			}
+		}
 
-            private set
-            {
-                this.transactionsModel.Transactions = value;
-            }
-        }
+		/// <summary>
+		/// Initialize controller features
+		/// </summary>
+		public void Initialize()
+		{
+			this.RegisterModelsWithView();
+		}
 
-        public List<ITransaction> OpenList
-        {
-            get
-            {
-                return (from t in this.transactionsModel.Transactions.AsEnumerable()
-                        where t.SaleDate == null
-                        select t).ToList();
-            }
-        }
-
-        /// <summary>
-        /// Updates to the latest data
-        /// </summary>
-        public void Update()
-        {
-            this.transactionsModel.Update();
-        }
+		/// <summary>
+		/// Updates the models
+		/// </summary>
+		public void Update()
+		{
+			this.transactionsObserver.Update();
+			this.openTransactionsObserver.Update();
+		}
 
         public List<ITransaction> GetTransactionForThisYear(string symbol)
         {
-            return this.transactionsModel.Transactions.Where(a => a.EquitySymbol == symbol)
-                            .Where(b => b.SaleDate == null || 
-                                b.SaleDate.Value.Year == DateTime.Now.Year).ToList();
+            return new List<ITransaction>(); ///this.transactionsObserver.Transactions.Where(a => a.EquitySymbol == symbol)
+                                            ///         .Where(b => b.SaleDate == null || 
+                                            ///             b.SaleDate.Value.Year == DateTime.Now.Year).ToList();
         }
 
-        public bool AddPurchase(DateTime date, string stock, double quantity, decimal cost)
-        {
-            return this.transactionsModel.Add(date, stock, quantity, cost);
-        }
+		/// <summary>
+		/// Add new transaction (buy)
+		/// </summary>
+		/// <param name="date">Date of purchase.</param>
+		/// <param name="stock">Stock purchased.</param>
+		/// <param name="quantity">Number of shares purchased.</param>
+		/// <param name="cost">Total cost basis.</param>
+		public void AddPosition(DateTime date, string stock, double quantity, decimal cost)
+		{
+			this.transactionWriter.Add(date, stock, quantity, cost);
+			this.Update();
+		}
 
-        public bool SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds)
-        {
-            return this.transactionsModel.Sell(rowIndex, saleDate, quantity, saleProceeds);
-        }
+		/// <summary>
+		/// Sell open position
+		/// </summary>
+		/// <param name="rowIndex">The row indexof holding to sell</param>
+		/// <param name="saleDate">Date of sale.</param>
+		/// <param name="quantity">Number of shares sold.</param>
+		/// <param name="saleProceeds">Total proceeds of sale.</param>	
+		public void SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds)
+		{
+			this.transactionWriter.Sell(rowIndex, saleDate, quantity, saleProceeds);
+			this.Update();
+		}
 
-        public bool SplitPosition(string equitySymbol, double splitRatio)
-        {
-            return this.transactionsModel.Split(equitySymbol, splitRatio);
-        }
+		/// <summary>
+		/// Current holding is split
+		/// </summary>
+		/// <param name="equitySymbol">Stock to be split.</param>
+		/// <param name="splitRatio">The share split ratio</param>
+		public void SplitPosition(string equitySymbol, double splitRatio)
+		{
+			this.transactionWriter.Split(equitySymbol, splitRatio);
+			this.Update();
+		}
 
-        /// <summary>
-        /// Returns all the dividend payment for an equity between a particular time range
-        /// </summary>
-        /// <param name="tickerSymbol">Equity symbol</param>
-        /// <param name="startDate"> Begining of time range</param>
-        /// <param name="endDate">End of time range</param>
-        /// <returns>List of dividend payments</returns>
-        private List<decimal> GetDividend(string tickerSymbol, DateTime? startDate, DateTime? endDate)
-        {
-            List<decimal> dividends = new List<decimal>();
-            if (startDate == null)
-            {
-                throw new Exception();
-            }
+		/// <summary>
+		/// Register all view observers to the model									 
+		/// </summary>
+		private void RegisterModelsWithView()
+		{
+			ListChangedEventHandler<ITransaction> completeTransactionHandler;
+			this.transactionView.RegisterCompleteTransactionList(out completeTransactionHandler);
+			this.transactionsObserver.RegisterObserver(completeTransactionHandler);
 
-            if (endDate == null)
-            {
-                endDate = DateTime.Now;
-            }
+			ListChangedEventHandler<ITransaction> openTransactionHandler;
+			this.transactionView.RegisterOpenTransactionList(out openTransactionHandler);
+			this.openTransactionsObserver.RegisterObserver(openTransactionHandler);
+		}
+													
+		/// <summary>
+		/// Returns all the dividend payment for an equity between a particular time range
+		/// </summary>
+		/// <param name="tickerSymbol">Equity symbol</param>
+		/// <param name="startDate"> Begining of time range</param>
+		/// <param name="endDate">End of time range</param>
+		/// <returns>List of dividend payments</returns>
+		private List<decimal> GetDividend(string tickerSymbol, DateTime? startDate, DateTime? endDate)
+		{
+			List<decimal> dividends = new List<decimal>();
+			if (startDate == null)
+			{
+				throw new Exception();
+			}
 
-            this.server.GetDividendsOverTimeSpan(tickerSymbol, startDate.Value, endDate.Value, ref dividends);
-            return dividends;
-        }
-    } 
+			if (endDate == null)
+			{
+				endDate = DateTime.Now;
+			}
+
+			this.server.GetDividendsOverTimeSpan(tickerSymbol, startDate.Value, endDate.Value, ref dividends);
+			return dividends;
+		}
+	} 
 }

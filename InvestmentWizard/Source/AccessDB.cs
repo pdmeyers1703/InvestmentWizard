@@ -47,6 +47,8 @@
                     {
                         adpater.Fill(dt);
                     }
+
+					conn.Close();
                 }
 
                 return dt;
@@ -90,16 +92,18 @@
             DataTable dt = new DataTable();
             try
             {
-                using (OleDbConnection conn = new OleDbConnection(ConnectionStr))
+                using (OleDbConnection conn = new OleDbConnection(ConnectionStr + this.databasePath))
                 {
                     conn.Open();
                     OleDbCommand cmd = new OleDbCommand();
                     cmd.Connection = conn;
-                    cmd.CommandText = "SELECT * FROM " + tableName + " WHERE [" + col + "]=" + criteria.ToString();
+                    cmd.CommandText = "SELECT * FROM " + tableName + " WHERE [" + col + "]='" + criteria.ToString() + "'";
                     using (OleDbDataAdapter adpater = new OleDbDataAdapter(cmd))
                     {
                         adpater.Fill(dt);
                     }
+
+                    conn.Close();
                 }
 
                 return dt;
@@ -121,7 +125,7 @@
         {
             try
             {
-                using (OleDbConnection conn = new OleDbConnection(ConnectionStr))
+                using (OleDbConnection conn = new OleDbConnection(ConnectionStr + this.databasePath))
                 {
                     conn.Open();
                     OleDbCommand cmd = new OleDbCommand();
@@ -172,7 +176,7 @@
 
             try
             {
-                using (OleDbConnection conn = new OleDbConnection(ConnectionStr))
+                using (OleDbConnection conn = new OleDbConnection(ConnectionStr + this.databasePath))
                 {
                     conn.Open();
                     OleDbCommand cmd = new OleDbCommand();

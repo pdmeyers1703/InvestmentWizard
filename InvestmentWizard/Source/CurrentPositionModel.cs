@@ -4,142 +4,140 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
-    public class CurrentPositionModel : ICurrentPositionsModel
+    public class CurrentPositionModel : IListObservable<ICurrentPosition>, IObserver<ITransaction>
     {
-        private List<IOpenPositions> currentPositions;
-        private OpenPositionTotals totals = null;
+        private List<ICurrentPosition> currentPositions;
+		private IList<ITransaction> openTransactions;
+        ////private OpenPositionTotals totals = null;
         private IFinancialData server;
-        private ITransactionsModel transactionsModel;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="server">client for real-time quotes</param>
-        /// <param name="transactions">database</param>
-        public CurrentPositionModel(IFinancialData server, ITransactionsModel transactionsModel)
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="server">client for real-time quotes</param>
+		/// <param name="transactions">database</param>
+		/// <param name="transactionsModel">transactions model</param>
+		public CurrentPositionModel(IFinancialData server)
+		{
+			this.currentPositions = new List<ICurrentPosition>();
+			this.openTransactions = new List<ITransaction>();
+			this.server = server;
+		}
+
+		/// <summary>
+		/// Observer event
+		/// </summary>
+		/// <param name="list"></param>
+		private event ListChangedEventHandler<ICurrentPosition> ListChangedObserver;
+
+		/// <summary>
+		/// Registers observer from the view
+		/// </summary>
+		/// <param name="listChangedObserver">Observer to monitor current open positions</param>
+		public void RegisterObserver(ListChangedEventHandler<ICurrentPosition> listChangedObserver)
+		{
+			this.ListChangedObserver += listChangedObserver;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public ListChangedEventHandler<ITransaction> GetObserverEventHandler()
+		{
+			return this.OnOpenTransactionsChanged;
+		}
+
+		/// <summary>
+		/// Get the last prices, etc for all equities in the 
+		/// open positions list.
+		/// </summary>
+		public void Update()
+		{
+			List<PriceQuote> quotes = new List<PriceQuote>();
+
+			this.server.GetPrices(this.GetTickerSymbols(), out quotes);
+
+			foreach (var q in quotes)
+			{
+				ICurrentPosition o = this.currentPositions.Find(a => a.StockTicker == q.Symbol);
+				o.UpdateRealTimeQuote(q);
+				decimal ytdCost = this.GetEquityYearToDateCost(q.Symbol);
+				o.YtdPercentGainLoss = ytdCost == 0 ? 0.00f : (double)((o.CurrentMarketValue - ytdCost) / ytdCost);
+			}
+
+			this.ListChangedObserver(this.currentPositions);
+		}
+
+		private void OnOpenTransactionsChanged(IList<ITransaction> openTransactions)
+		{
+			this.openTransactions = openTransactions;
+			this.UpdateList();
+		}
+
+		/// <summary>
+		/// Builds the latest list of current positions
+		/// </summary>
+		/// <param name="list"></param>
+		private void UpdateList()
+		{
+			// Clear previously built list
+			this.currentPositions.Clear();
+
+			foreach (var t in this.openTransactions)
+			{
+				ICurrentPosition open = this.GetPosition(t.EquitySymbol);
+
+				if (open != null)
+				{
+					open.Quantity += t.Quanity;
+					open.Cost += t.Cost;
+				}
+				else
+				{
+					List<PriceQuote> quotes = new List<PriceQuote>();
+					this.server.GetPrices(new List<string>() { t.EquitySymbol }, out quotes);
+					OpenPositions newOpenPos =
+						new OpenPositions(t.EquitySymbol, t.Quanity, t.Cost, quotes[0].LastPrice, quotes[0].PriceChangeAbsolute, quotes[0].PriceChangePercent);
+					this.currentPositions.Add(newOpenPos);
+				}
+			}
+
+			this.Update();
+		}
+
+		/////// <summary>
+		/////// Addes total to the last row in the open positions list.
+		/////// </summary>
+		////public void BuildTotals()
+		////{
+		////    this.DeleteTotals();
+
+		////    this.totals = new OpenPositionTotals();
+		////    this.totals.StockTicker = "Total:";
+		////    this.totals.Quantity = null;
+		////    this.totals.Cost = this.CalcTotalCost();
+		////    this.totals.CurrentPrice = null;
+		////    this.totals.CurrentMarketValue = this.CalcTotalMarketValue();
+		////    this.totals.GainLoss = this.CalcTotalMarketValue() - this.CalcTotalCost();
+		////    this.totals.PercentGainLoss = this.CalcTotalCost() != 0 ? (double)(this.totals.GainLoss / this.CalcTotalCost()) : 0.00;
+		////    this.totals.PriceChange = string.Empty;
+		////    this.totals.PriceChangePercent = this.CalcPriceChangePercent().ToString();
+		////    this.totals.YtdPercentGainLoss = this.CalYTDPriceChangePercentTotal();
+
+		////    this.currentPositions.Add(this.totals);
+		////}
+
+		/// <summary>
+		/// Returns the OpenPosition recored that matches the specified
+		/// ticker symbol. If no matches returns null.
+		/// </summary>
+		/// <param name="symbol">Equity Symbol to match</param>
+		/// <returns>OpenPositions object</returns>
+		private ICurrentPosition GetPosition(string symbol)
         {
-            this.currentPositions = new List<IOpenPositions>();
-            this.server = server;
-            this.transactionsModel = transactionsModel;
-        }
-
-        /// <summary>
-        // Get/Set the list of current positions
-        /// </summary>
-        public List<IOpenPositions> CurrentPositions 
-        {
-            get
-            {
-                return this.currentPositions;
-            }
-
-            private set
-            {
-                this.currentPositions = value;
-            }
-        }
-
-        /// <summary>
-        /// Builds the latest list of current positions
-        /// </summary>
-        /// <param name="list"></param>
-        public void Update(IList<ITransaction> list)
-        {
-            if (list == null)
-            {
-                throw new ArgumentNullException();
-            }
-
-            // Clear previously built list
-            this.currentPositions.Clear();
-
-            foreach (var t in from r in list where r.SaleDate == null select r)
-            {
-                IOpenPositions open = this.GetPosition(t.EquitySymbol);
-
-                if (open != null)
-                {
-                    open.Quantity += t.Quanity;
-                    open.Cost += t.Cost;
-                }
-                else
-                {
-                    OpenPositions newOpenPos = new OpenPositions();
-                    newOpenPos.StockTicker = t.EquitySymbol;
-                    newOpenPos.Quantity = t.Quanity;
-                    newOpenPos.Cost = t.Cost;
-                    this.currentPositions.Add(newOpenPos);
-                }
-            }
-
-            this.Update();
-        }
-
-        /// <summary>
-        /// Get the last prices, etc for all equities in the 
-        /// open positions list.
-        /// </summary>
-        public void Update()
-        {
-            List<PriceQuote> quotes = new List<PriceQuote>();
-            List<string> symbols = this.GetTickerSymbols();
-
-            this.server.GetPrices(symbols, out quotes);
-
-            foreach (var q in quotes)
-            {
-                IOpenPositions o = this.currentPositions.Find(a => a.StockTicker == q.Symbol);
-                o.CurrentPrice = q.LastPrice;
-                o.PriceChange = q.PriceChangeAbsolute;
-                o.PriceChangePercent = q.PriceChangePercent;
-                
-                // Calculate YTD price change
-                decimal ytdCost = this.GetEquityYearToDateCost(q.Symbol);
-                if (ytdCost == 0)
-                {
-                    o.YtdPercentGainLoss = 0.00f;
-                }
-                else
-                {
-                    o.YtdPercentGainLoss = (double)((o.CurrentMarketValue - ytdCost) / ytdCost);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Addes total to the last row in the open positions list.
-        /// </summary>
-        public void BuildTotals()
-        {
-            this.DeleteTotals();
-            
-            this.totals = new OpenPositionTotals();
-            this.totals.StockTicker = "Total:";
-            this.totals.Quantity = null;
-            this.totals.Cost = this.CalcTotalCost();
-            this.totals.CurrentPrice = null;
-            this.totals.CurrentMarketValue = this.CalcTotalMarketValue();
-            this.totals.GainLoss = this.CalcTotalMarketValue() - this.CalcTotalCost();
-            this.totals.PercentGainLoss = this.CalcTotalCost() != 0 ? (double)(this.totals.GainLoss / this.CalcTotalCost()) : 0.00;
-            this.totals.PriceChange = string.Empty;
-            this.totals.PriceChangePercent = this.CalcPriceChangePercent().ToString();
-            this.totals.YtdPercentGainLoss = this.CalYTDPriceChangePercentTotal();
-
-            this.currentPositions.Add(this.totals);
-        }
-
-        /// <summary>
-        /// Returns the OpenPosition recored that matches the specified
-        /// ticker symbol. If no matches returns null.
-        /// </summary>
-        /// <param name="symbol">Equity Symbol to match</param>
-        /// <returns>OpenPositions object</returns>
-        private IOpenPositions GetPosition(string symbol)
-        {
-            return this.currentPositions.Find(delegate(IOpenPositions pos) 
+            return this.currentPositions.Find(delegate(ICurrentPosition pos) 
             { 
                 return pos.StockTicker == symbol; 
             });
@@ -195,7 +193,7 @@
         /// <returns> total price change</returns>
         private double CalcPriceChangePercent()
         {
-            List<IOpenPositions> list = this.currentPositions.GetRange(0, this.currentPositions.Count() - 1);
+            List<ICurrentPosition> list = this.currentPositions.GetRange(0, this.currentPositions.Count() - 1);
             double startPrice = list.Sum(x => (Convert.ToDouble(x.CurrentPrice) -
                                                Convert.ToDouble(x.PriceChange)) * 
                                                (double)x.Quantity);
@@ -244,9 +242,9 @@
         {
             decimal cost = 0;
 
-            IEnumerable<ITransaction> transactions = from t in this.transactionsModel.Transactions
-                                                      where t.EquitySymbol == equitySymbol
-                                                      select t;
+            IEnumerable<ITransaction> transactions = from t in this.openTransactions
+                                                     where t.EquitySymbol == equitySymbol
+                                                     select t;
                 
             foreach (var t in transactions)
             {
