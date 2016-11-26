@@ -26,6 +26,6 @@ namespace InvestmentWizard
 		/// </summary>
 		/// <param name="cellString">Value in string format.</param>
 		/// <returns>Color determined.</returns>
-		Color GetCellColor(string cellString);
+		Color GetTextColor(string cellString);
 	}
 }

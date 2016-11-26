@@ -6,20 +6,25 @@ namespace InvestmentWizard
 {
 	using System;
 	using System.Collections.Generic;
-	using System.ComponentModel;
 	using System.Data;
 	using System.Drawing;
 	using System.Linq;
 	using System.Windows.Forms;
 
-    public partial class Main : Form, ITransactionsView, ICurrentPositionsView
+	public partial class Main : Form, ITransactionsView, ICurrentPositionsView
 	{
-        private IFinancialData financialDataClient = new YahooFinancalDataClient();
-        private ITransactionController transactionController;
+		private IFinancialData financialDataClient = new YahooFinancalDataClient();
+		private ITransactionController transactionController;
 		private ICurrentPositionsController currentPositionsController;
-        private IList<ITransaction> openTransactionsList;
+		private IList<ITransaction> openTransactionsList;
 		private IViewFormatter<ICurrentPosition> currentpositionsFormatter;
-        
+
+		/// <summary>
+		/// Constructor for main form.
+		/// </summary>
+		/// <param name="transactionController">The controller for all transactions</param>
+		/// <param name="currentPositionsController">The controller for current positions.</param>
+		/// <param name="currentpositionsFormatter">Formats data for current positions view</param>
 		public Main(
 			ITransactionController transactionController,
 			ICurrentPositionsController currentPositionsController,
@@ -36,77 +41,93 @@ namespace InvestmentWizard
 		}
 
 		/// <summary>
-		/// Passing the view handler to the controller
+		/// Registers the transactions handler (observer)
 		/// </summary>
-		/// <param name="handler">list change handler</param>
+		/// <param name="handler">List change handler,</param>
 		public void RegisterCompleteTransactionList(out ListChangedEventHandler<ITransaction> handler)
 		{
 			handler = new ListChangedEventHandler<ITransaction>(this.OnTransactionListChanged);
 		}
 
 		/// <summary>
-		/// Passing the view handler to the controller
+		/// Registers the open transactions handler (observer)
 		/// </summary>
-		/// <param name="handler">list change handler</param>
+		/// <param name="handler">List change handler.</param>
 		public void RegisterOpenTransactionList(out ListChangedEventHandler<ITransaction> handler)
 		{
 			handler = new ListChangedEventHandler<ITransaction>(this.OpenTransactionListChanged);
 		}
 
+		/// <summary>
+		/// Registers the current positions handler (observer)
+		/// </summary>
+		/// <param name="handler">List change handler.</param>
 		public void RegisterCurrentPositionsList(out ListChangedEventHandler<ICurrentPosition> handler)
 		{
 			handler = new ListChangedEventHandler<ICurrentPosition>(this.CurrentPositionsListChanged);
 		}
 
+		/// <summary>
+		/// Event handler to refresh quotes.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void OnClick_UpdateQuotes(object sender, EventArgs e)
-        {
-            this.UpdateCurrentPositionsDataGridViewQuotes();
-        }
+		{
+			this.UpdateCurrentPositionsDataGridView();
+		}
 
-        private void Main_Load(object sender, EventArgs e)
-        {
+		/// <summary>
+		/// Event handler when main winform loads.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Main_Load(object sender, EventArgs e)
+		{
 			this.transactionController.Initialize();
 			this.currentPositionsController.Initialize();
 
-            try
-            {
-                this.transactionController.Update();
-                this.currentPositionsController.Update();
-            }
-            catch
-            {
-                return;
-            }
-        }
+			try
+			{
+				this.transactionController.Update();
+				this.currentPositionsController.Update();
+			}
+			catch
+			{
+				MessageBox.Show("Could not load transactions or current positions!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+		}
 
-        /// <summary>
-        /// Get the latest real-time stock prices and then uses them to populate
-        /// the open positions list and update the data grid view
-        /// </summary>
-        private void UpdateCurrentPositionsDataGridViewQuotes()
-        {
-            Cursor.Current = Cursors.WaitCursor;
-            try
-            {
-                this.currentPositionsController.Update();
-                ////this.openPositions.BuildTotals();
-               
-                PriceQuote sp500 = this.GetSP500Quote();
-                decimal sp500LastYear = Convert.ToDecimal(this.GetSP500QuoteYTD());
-                double sp500YTD = (double)Math.Round((Convert.ToDecimal(sp500.PreviousClose) - sp500LastYear) / sp500LastYear * 100, 2);
-                this.toolStripStatusLabel.Text = "Quotes Last Updated on:  "  + DateTime.Now.ToString();
-                this.toolStripStatusLabel2.Text = sp500.Name + ": Today;";
-                this.toolStripStatusLabel3.Text = sp500.PriceChangePercent;
-                this.toolStripStatusLabel4.Text = " YTD;";
-                this.toolStripStatusLabel5.Text = sp500YTD.ToString();
-            }
-            catch
-            {
-                MessageBox.Show("Failed to update current positions list.");
-            }
-            
-            Cursor.Current = Cursors.Default;
-        }
+		/// <summary>
+		/// Get the latest real-time stock prices and then uses them to populate
+		/// the open positions list and update the data grid view
+		/// </summary>
+		private void UpdateCurrentPositionsDataGridView()
+		{
+			string previousLastQuoteUpdate = this.lastQuoteUpdateStatusLabel.Text;
+			Cursor.Current = Cursors.WaitCursor;
+			try
+			{
+				this.lastQuoteUpdateStatusLabel.Text = "Quotes are Updating...";
+				this.currentPositionsController.Update();
+
+				PriceQuote sp500 = this.GetSP500Quote();
+				decimal sp500LastYear = Convert.ToDecimal(this.GetSP500QuoteYTD());
+				double sp500YTD = (double)Math.Round((Convert.ToDecimal(sp500.PreviousClose) - sp500LastYear) / sp500LastYear * 100, 2);
+				this.sp00TodayTextStatusLabel.Text = sp500.Name + ": Today - ";
+				this.sp500TodayValueStatusLabel.Text = sp500.PriceChangePercent;
+				this.sp00YtdTextStatusLabel.Text = " YTD - ;";
+				this.sp500YtdValueStatusLabel.Text = sp500YTD.ToString();
+			}
+			catch
+			{
+				MessageBox.Show("Could update current positions!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				this.lastQuoteUpdateStatusLabel.Text = previousLastQuoteUpdate;
+			}
+
+			Cursor.Current = Cursors.Default;
+			this.lastQuoteUpdateStatusLabel.Text = "Quotes Last Updated on:  " + DateTime.Now.ToString();
+		}
 
         /// <summary>
         /// Retrieves the S&P 500 Index quote
@@ -148,11 +169,33 @@ namespace InvestmentWizard
 				col == "YtdPercentGainLoss" ||
 				col == "percentGainLoss")
 			{
-				e.CellStyle.ForeColor = this.currentpositionsFormatter.GetCellColor(e.Value as string);
+				e.CellStyle.ForeColor = this.currentpositionsFormatter.GetTextColor(e.Value as string);
 			}
 		}
 
-        private void TabPageCurrentOpenPositions_Enter(object sender, EventArgs e)
+		/// <summary>
+		/// Event handler to apply correct text color when sp500 daily % changes.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void SP00TodayValueStatusLabel_TextChanged(object sender, EventArgs e)
+		{
+			this.sp500TodayValueStatusLabel.ForeColor =
+				this.currentpositionsFormatter.GetTextColor(this.sp500TodayValueStatusLabel.Text);
+		}
+
+		/// <summary>
+		/// Event handler to apply correct text color when sp500 ytd % changes.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void SP500YtdValueStatusLabel_TextChanged(object sender, EventArgs e)
+		{
+			this.sp500YtdValueStatusLabel.ForeColor =
+				this.currentpositionsFormatter.GetTextColor(this.sp500YtdValueStatusLabel.Text);
+		}
+
+		private void TabPageCurrentOpenPositions_Enter(object sender, EventArgs e)
         {
             Cursor.Current = Cursors.WaitCursor;
             this.updateQuotes.Enabled = true;
@@ -161,7 +204,7 @@ namespace InvestmentWizard
             this.toolStripButtonSplit.Enabled = false;
             
             this.currentPositionsController.Update();
-            this.UpdateCurrentPositionsDataGridViewQuotes();            
+            this.UpdateCurrentPositionsDataGridView();            
             Cursor.Current = Cursors.Default;
         }
 
@@ -221,31 +264,7 @@ namespace InvestmentWizard
 				aboutBox.Close();
 			}
 		}
-
-        private void ToolStripStatusLabel3_TextChanged(object sender, EventArgs e)
-        {
-            if (Convert.ToDouble(this.toolStripStatusLabel3.Text.TrimEnd('%')) < 0)
-            {
-                this.toolStripStatusLabel3.ForeColor = Color.Red;
-            }
-            else
-            {
-                this.toolStripStatusLabel3.ForeColor = Color.Green;
-            }
-        }
-
-        private void ToolStripStatusLabel5_TextChanged(object sender, EventArgs e)
-        {
-            if (Convert.ToDouble(this.toolStripStatusLabel5.Text.TrimEnd('%')) < 0)
-            {
-                this.toolStripStatusLabel5.ForeColor = Color.Red;
-            }
-            else
-            {
-                this.toolStripStatusLabel5.ForeColor = Color.Green;
-            }
-        }
-
+		
 		/// <summary>
 		/// Observer registered to model
 		/// </summary>
@@ -310,5 +329,5 @@ namespace InvestmentWizard
 
             dataGridView.Update();
         }
-    }
+	}
 }

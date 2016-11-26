@@ -41,7 +41,7 @@ namespace InvestmentWizard
 		/// </summary>
 		/// <param name="cellString">Value in string format.</param>
 		/// <returns>Color determined.</returns>
-		public Color GetCellColor(string cellString)
+		public Color GetTextColor(string cellString)
 		{
 			Color color = Color.Black;
 
