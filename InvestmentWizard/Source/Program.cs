@@ -43,7 +43,7 @@
             container.Register<IDatabase>(() => DatabaseFactory.Create(new AccessDB()), Lifestyle.Singleton);
             container.Register<IFinancialData, YahooFinancalDataClient>(Lifestyle.Singleton);
 
-			container.Register<IViewFormatter<ICurrentPosition, List<string>>, CurrentPositionsViewFormatter>(Lifestyle.Singleton);
+			container.Register<IViewFormatter<ICurrentPosition>, CurrentPositionsViewFormatter>(Lifestyle.Singleton);
 
 			var registration = Lifestyle.Singleton.CreateRegistration<TransactionsListReadModel>(container);
 			container.RegisterConditional(typeof(IListObservable<ITransaction>), registration, o => o.Consumer.Target.Parameter.Name.Equals("transactionsObserver"));

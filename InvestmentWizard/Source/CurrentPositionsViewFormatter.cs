@@ -11,14 +11,14 @@ namespace InvestmentWizard
 	/// <summary>
 	/// Formats current positions data for data grid view
 	/// </summary>
-	public class CurrentPositionsViewFormatter : IViewFormatter<ICurrentPosition, List<string>>
+	public class CurrentPositionsViewFormatter : IViewFormatter<ICurrentPosition>
 	{
 		/// <summary>
 		/// Basic formatting of data types, decimals places, special characters (%,$)
 		/// </summary>
 		/// <param name="currentPosition">A single position</param>
 		/// <returns>A list of strings representing a poistions formatted for data grid view</returns>
-		public List<string> FormatData(ICurrentPosition currentPosition)
+		public List<string> FormatDataToStringList(ICurrentPosition currentPosition)
 		{
 			List<string> formattedData = new List<string>();
 

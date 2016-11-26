@@ -18,12 +18,12 @@ namespace InvestmentWizard
         private ITransactionController transactionController;
 		private ICurrentPositionsController currentPositionsController;
         private IList<ITransaction> openTransactionsList;
-		private IViewFormatter<ICurrentPosition, List<string>> currentpositionsFormatter;
+		private IViewFormatter<ICurrentPosition> currentpositionsFormatter;
         
 		public Main(
 			ITransactionController transactionController,
 			ICurrentPositionsController currentPositionsController,
-			IViewFormatter<ICurrentPosition, List<string>> currentpositionsFormatter)
+			IViewFormatter<ICurrentPosition> currentpositionsFormatter)
 		{
 			this.InitializeComponent();
 
@@ -277,12 +277,11 @@ namespace InvestmentWizard
 		/// <param name="currentPositions">Current poistion list</param>
 		private void CurrentPositionsListChanged(IList<ICurrentPosition> currentPositions)
 		{
-			IViewFormatter<ICurrentPosition, List<string>> formatter = new CurrentPositionsViewFormatter();
 			IList<IList<string>> displayableList = new List<IList<string>>();
 
 			foreach (var position in currentPositions)
 			{
-				displayableList.Add(formatter.FormatData(position));
+				displayableList.Add(this.currentpositionsFormatter.FormatDataToStringList(position));
 			}
 
 			this.UpdateDataGrid(this.dataGridViewCurPos, displayableList);
