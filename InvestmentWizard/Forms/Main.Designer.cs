@@ -9,8 +9,8 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton updateQuotes;
         private System.Windows.Forms.DataGridView dataGridViewCurPos;
-        private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
+        private System.Windows.Forms.StatusStrip statusStrip;
+        private System.Windows.Forms.ToolStripStatusLabel lastQuoteUpdateStatusLabel;
         private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.TabPage tabPageMain;
         private System.Windows.Forms.TabPage tabPageTransactions;
@@ -83,13 +83,13 @@
 			this.currentMarketValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.gainLoss = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.percentGainLoss = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-			this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+			this.statusStrip = new System.Windows.Forms.StatusStrip();
+			this.lastQuoteUpdateStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-			this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
-			this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
-			this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
-			this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
+			this.sp00TodayTextStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+			this.sp500TodayValueStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+			this.sp00YtdTextStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+			this.sp500YtdValueStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.tabControl = new System.Windows.Forms.TabControl();
 			this.tabPageMain = new System.Windows.Forms.TabPage();
 			this.tabPageTransactions = new System.Windows.Forms.TabPage();
@@ -106,7 +106,7 @@
 			this.transactionsBindingSource = new System.Windows.Forms.BindingSource(this.components);
 			this.toolStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewCurPos)).BeginInit();
-			this.statusStrip1.SuspendLayout();
+			this.statusStrip.SuspendLayout();
 			this.tabControl.SuspendLayout();
 			this.tabPageMain.SuspendLayout();
 			this.tabPageTransactions.SuspendLayout();
@@ -358,25 +358,25 @@
 			this.percentGainLoss.ReadOnly = true;
 			this.percentGainLoss.Width = 75;
 			// 
-			// statusStrip1
+			// statusStrip
 			// 
-			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel,
+			this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lastQuoteUpdateStatusLabel,
             this.toolStripStatusLabel1,
-            this.toolStripStatusLabel2,
-            this.toolStripStatusLabel3,
-            this.toolStripStatusLabel4,
-            this.toolStripStatusLabel5});
-			this.statusStrip1.Location = new System.Drawing.Point(0, 453);
-			this.statusStrip1.Name = "statusStrip1";
-			this.statusStrip1.Size = new System.Drawing.Size(881, 22);
-			this.statusStrip1.TabIndex = 2;
-			this.statusStrip1.Text = "Ready to make some Money!!!";
+            this.sp00TodayTextStatusLabel,
+            this.sp500TodayValueStatusLabel,
+            this.sp00YtdTextStatusLabel,
+            this.sp500YtdValueStatusLabel});
+			this.statusStrip.Location = new System.Drawing.Point(0, 453);
+			this.statusStrip.Name = "statusStrip1";
+			this.statusStrip.Size = new System.Drawing.Size(881, 22);
+			this.statusStrip.TabIndex = 2;
+			this.statusStrip.Text = "Ready to make some Money!!!";
 			// 
-			// toolStripStatusLabel
+			// lastQuoteUpdateStatusLabel
 			// 
-			this.toolStripStatusLabel.Name = "toolStripStatusLabel";
-			this.toolStripStatusLabel.Size = new System.Drawing.Size(0, 17);
+			this.lastQuoteUpdateStatusLabel.Name = "lastQuoteUpdateStatusLabel";
+			this.lastQuoteUpdateStatusLabel.Size = new System.Drawing.Size(0, 17);
 			// 
 			// toolStripStatusLabel1
 			// 
@@ -384,35 +384,35 @@
 			this.toolStripStatusLabel1.Padding = new System.Windows.Forms.Padding(50, 0, 0, 0);
 			this.toolStripStatusLabel1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.toolStripStatusLabel1.RightToLeftAutoMirrorImage = true;
-			this.toolStripStatusLabel1.Size = new System.Drawing.Size(866, 17);
+			this.toolStripStatusLabel1.Size = new System.Drawing.Size(835, 17);
 			this.toolStripStatusLabel1.Spring = true;
 			this.toolStripStatusLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// toolStripStatusLabel2
+			// sp00TodayTextStatusLabel
 			// 
-			this.toolStripStatusLabel2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-			this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-			this.toolStripStatusLabel2.Size = new System.Drawing.Size(0, 17);
+			this.sp00TodayTextStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+			this.sp00TodayTextStatusLabel.Name = "sp00TodayTextStatusLabel";
+			this.sp00TodayTextStatusLabel.Size = new System.Drawing.Size(0, 17);
 			// 
-			// toolStripStatusLabel3
+			// sp500TodayValueStatusLabel
 			// 
-			this.toolStripStatusLabel3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-			this.toolStripStatusLabel3.Name = "toolStripStatusLabel3";
-			this.toolStripStatusLabel3.Size = new System.Drawing.Size(0, 17);
-			this.toolStripStatusLabel3.TextChanged += new System.EventHandler(this.ToolStripStatusLabel3_TextChanged);
+			this.sp500TodayValueStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+			this.sp500TodayValueStatusLabel.Name = "sp500TodayValueStatusLabel";
+			this.sp500TodayValueStatusLabel.Size = new System.Drawing.Size(0, 17);
+			this.sp500TodayValueStatusLabel.TextChanged += new System.EventHandler(this.SP00TodayValueStatusLabel_TextChanged);
 			// 
-			// toolStripStatusLabel4
+			// sp00YtdTetStatusLabel
 			// 
-			this.toolStripStatusLabel4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.toolStripStatusLabel4.Name = "toolStripStatusLabel4";
-			this.toolStripStatusLabel4.Size = new System.Drawing.Size(0, 17);
+			this.sp00YtdTextStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.sp00YtdTextStatusLabel.Name = "sp00YtdTetStatusLabel";
+			this.sp00YtdTextStatusLabel.Size = new System.Drawing.Size(0, 17);
 			// 
-			// toolStripStatusLabel5
+			// sp500YtdValueStatusLabel
 			// 
-			this.toolStripStatusLabel5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.toolStripStatusLabel5.Name = "toolStripStatusLabel5";
-			this.toolStripStatusLabel5.Size = new System.Drawing.Size(0, 17);
-			this.toolStripStatusLabel5.TextChanged += new System.EventHandler(this.ToolStripStatusLabel5_TextChanged);
+			this.sp500YtdValueStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.sp500YtdValueStatusLabel.Name = "sp500YtdValueStatusLabel";
+			this.sp500YtdValueStatusLabel.Size = new System.Drawing.Size(0, 17);
+			this.sp500YtdValueStatusLabel.TextChanged += new System.EventHandler(this.SP500YtdValueStatusLabel_TextChanged);
 			// 
 			// tabControl
 			// 
@@ -604,7 +604,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(881, 475);
 			this.Controls.Add(this.tabControl);
-			this.Controls.Add(this.statusStrip1);
+			this.Controls.Add(this.statusStrip);
 			this.Controls.Add(this.toolStrip1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "Main";
@@ -613,8 +613,8 @@
 			this.toolStrip1.ResumeLayout(false);
 			this.toolStrip1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewCurPos)).EndInit();
-			this.statusStrip1.ResumeLayout(false);
-			this.statusStrip1.PerformLayout();
+			this.statusStrip.ResumeLayout(false);
+			this.statusStrip.PerformLayout();
 			this.tabControl.ResumeLayout(false);
 			this.tabPageMain.ResumeLayout(false);
 			this.tabPageTransactions.ResumeLayout(false);
@@ -632,8 +632,8 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton toolStripButtonAbout;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel3;
+        private System.Windows.Forms.ToolStripStatusLabel sp00TodayTextStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel sp500TodayValueStatusLabel;
         private System.Windows.Forms.DataGridViewTextBoxColumn stock;
         private System.Windows.Forms.DataGridViewTextBoxColumn currentPrice;
         private System.Windows.Forms.DataGridViewTextBoxColumn priceChange;
@@ -644,8 +644,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn currentMarketValue;
         private System.Windows.Forms.DataGridViewTextBoxColumn gainLoss;
         private System.Windows.Forms.DataGridViewTextBoxColumn percentGainLoss;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel4;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel5;
+        private System.Windows.Forms.ToolStripStatusLabel sp00YtdTextStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel sp500YtdValueStatusLabel;
         private System.Windows.Forms.DataGridViewTextBoxColumn PurchaseDate;
         private System.Windows.Forms.DataGridViewTextBoxColumn EquitySymbol;
         private System.Windows.Forms.DataGridViewTextBoxColumn Quantity2;
