@@ -74,7 +74,7 @@ namespace InvestmentWizard
 		/// <param name="e"></param>
 		private void OnClick_UpdateQuotes(object sender, EventArgs e)
 		{
-			this.UpdateCurrentPositionsDataGridView();
+			this.UpdateCurrentPositions();
 		}
 
 		/// <summary>
@@ -90,11 +90,10 @@ namespace InvestmentWizard
 			try
 			{
 				this.transactionController.Update();
-				this.currentPositionsController.Update();
 			}
 			catch
 			{
-				MessageBox.Show("Could not load transactions or current positions!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show("Could not load transactions!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 
@@ -102,14 +101,13 @@ namespace InvestmentWizard
 		/// Get the latest real-time stock prices and then uses them to populate
 		/// the open positions list and update the data grid view
 		/// </summary>
-		private void UpdateCurrentPositionsDataGridView()
+		private void UpdateCurrentPositions()
 		{
 			string previousLastQuoteUpdate = this.lastQuoteUpdateStatusLabel.Text;
 			Cursor.Current = Cursors.WaitCursor;
 			try
 			{
-				this.lastQuoteUpdateStatusLabel.Text = "Quotes are Updating...";
-				this.currentPositionsController.Update();
+				this.lastQuoteUpdateStatusLabel.Text = "Updating Quotes...";
 
 				PriceQuote sp500 = this.GetSP500Quote();
 				decimal sp500LastYear = Convert.ToDecimal(this.GetSP500QuoteYTD());
@@ -118,6 +116,8 @@ namespace InvestmentWizard
 				this.sp500TodayValueStatusLabel.Text = sp500.PriceChangePercent;
 				this.sp00YtdTextStatusLabel.Text = " YTD - ;";
 				this.sp500YtdValueStatusLabel.Text = sp500YTD.ToString();
+
+				this.currentPositionsController.Update();
 			}
 			catch
 			{
@@ -194,27 +194,34 @@ namespace InvestmentWizard
 			this.sp500YtdValueStatusLabel.ForeColor =
 				this.currentpositionsFormatter.GetTextColor(this.sp500YtdValueStatusLabel.Text);
 		}
-
+		
+		/// <summary>
+		/// Event handler when the current positions data grid view is entered.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void TabPageCurrentOpenPositions_Enter(object sender, EventArgs e)
-        {
-            Cursor.Current = Cursors.WaitCursor;
-            this.updateQuotes.Enabled = true;
-            this.toolStripButtonAddTransaction.Enabled = false;
-            this.toolStripButtonSellTransaction.Enabled = false;
-            this.toolStripButtonSplit.Enabled = false;
-            
-            this.currentPositionsController.Update();
-            this.UpdateCurrentPositionsDataGridView();            
-            Cursor.Current = Cursors.Default;
-        }
+		{
+			this.updateQuotes.Enabled = true;
+			this.toolStripButtonAddTransaction.Enabled = false;
+			this.toolStripButtonSellTransaction.Enabled = false;
+			this.toolStripButtonSplit.Enabled = false;
 
-        private void TabPageTransactions_Enter(object sender, EventArgs e)
-        {
-            this.updateQuotes.Enabled = false;
-            this.toolStripButtonAddTransaction.Enabled = true;
-            this.toolStripButtonSellTransaction.Enabled = true;
-            this.toolStripButtonSplit.Enabled = true;
-        }
+			this.UpdateCurrentPositions();
+		}
+
+		/// <summary>
+		/// Event handler when the transactions data grid view is entered.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void TabPageTransactions_Enter(object sender, EventArgs e)
+		{
+			this.updateQuotes.Enabled = false;
+			this.toolStripButtonAddTransaction.Enabled = true;
+			this.toolStripButtonSellTransaction.Enabled = true;
+			this.toolStripButtonSplit.Enabled = true;
+		}
 
 		/// <summary>
 		/// Shows the Add transaction dialog box
@@ -281,14 +288,14 @@ namespace InvestmentWizard
 			this.UpdateDataGrid(this.dataGridViewTransactions, displayableList);
 		}
 
-        /// <summary>
-        /// Observer registered to model
-        /// </summary>
-        /// <param name="openTransactionslist">Open transactions list.</param>
-        private void OpenTransactionListChanged(IList<ITransaction> openTransactionslist)
-        {
-            this.openTransactionsList = openTransactionslist;
-        }
+		/// <summary>
+		/// Observer registered to model
+		/// </summary>
+		/// <param name="openTransactionslist">Open transactions list.</param>
+		private void OpenTransactionListChanged(IList<ITransaction> openTransactionslist)
+		{
+			this.openTransactionsList = openTransactionslist;
+		}
 
 		/// <summary>
 		/// Observer registered to model
@@ -306,28 +313,28 @@ namespace InvestmentWizard
 			this.UpdateDataGrid(this.dataGridViewCurPos, displayableList);
 		}
 
-        /// <summary>
-        /// Updates a data grid view with a 2 deminsional list
-        /// </summary>
-        /// <param name="dataGridView">grid view to update</param>
-        /// <param name="lists">2 deminsional list</param>
-        private void UpdateDataGrid(DataGridView dataGridView, IList<IList<string>> lists)
-        {
+		/// <summary>
+		/// Updates a data grid view with a 2 deminsional list
+		/// </summary>
+		/// <param name="dataGridView">grid view to update</param>
+		/// <param name="lists">2 deminsional list</param>
+		private void UpdateDataGrid(DataGridView dataGridView, IList<IList<string>> lists)
+		{
 			dataGridView.Rows.Clear();
 
 			foreach (var r in lists)
-            {
-                var row = new DataGridViewRow();
-                dataGridView.ColumnCount = r.Count;
-                for (int i = 0; i < r.Count; ++i)
-                {
-                    row.Cells.Add(new DataGridViewTextBoxCell() { Value = r[i] });
-                }
+			{
+				var row = new DataGridViewRow();
+				dataGridView.ColumnCount = r.Count;
+				for (int i = 0; i < r.Count; ++i)
+				{
+					row.Cells.Add(new DataGridViewTextBoxCell() { Value = r[i] });
+				}
 
-                dataGridView.Rows.Add(row);
-            }
+				dataGridView.Rows.Add(row);
+			}
 
-            dataGridView.Update();
-        }
+			dataGridView.Update();
+		}
 	}
 }
