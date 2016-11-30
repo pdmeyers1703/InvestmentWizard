@@ -43,7 +43,7 @@ namespace InvestmentWizard
 				{
 					return Math.Round((decimal)((double)this.Cost / this.Quanity), 2);
 				}
-				catch (DivideByZeroException)
+				catch
 				{
 					return 0.00m;
 				}
