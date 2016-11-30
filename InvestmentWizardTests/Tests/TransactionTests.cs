@@ -1,9 +1,9 @@
-﻿using InvestmentWizard;
-using NUnit.Framework;
-using System;
-
-namespace InvestmentWizardTests
+﻿namespace InvestmentWizardTests
 {
+	using System;
+	using InvestmentWizard;
+	using NUnit.Framework;
+
 	[TestFixture]
     public class TransactionTests
     {

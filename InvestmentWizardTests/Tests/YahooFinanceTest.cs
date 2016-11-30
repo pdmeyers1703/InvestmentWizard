@@ -1,19 +1,18 @@
-﻿using InvestmentWizard;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
-using System.Collections.Generic;
-
-namespace InvestmentWizardTests
+﻿namespace InvestmentWizardTests
 {
-    [TestClass]
+	using System;
+	using System.Collections.Generic;
+	using InvestmentWizard;
+	using NUnit.Framework;
+
+	[TestFixture]
     public class YahooFinanceTest
     {
         private List<string> symbols;
         private YahooFinancalDataClient client;
         private List<PriceQuote> priceQuotes;
 
-        [TestInitialize]
+        [SetUp]
         public void Setup()
         {
             this.symbols = new List<string>();
@@ -21,7 +20,7 @@ namespace InvestmentWizardTests
             List<PriceQuote> p = new List<PriceQuote>();
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetPrices_GetOneValidStock()
         {
             // Arrange
@@ -31,17 +30,17 @@ namespace InvestmentWizardTests
             bool result = this.client.GetPrices(this.symbols, out this.priceQuotes);
 
             // Assert
-            Assert.AreEqual(true, result, "Method return code is not successful");
-            Assert.AreEqual("GOOG", this.priceQuotes[0].Symbol, "Ticker symbol is not correct");
-            Assert.AreEqual("Alphabet Inc.", this.priceQuotes[0].Name, "Company name is not correct");
-            Assert.IsTrue(this.priceQuotes[0].LastPrice > 0, "Last Price is 0");
-            Assert.IsTrue(this.priceQuotes[0].PreviousClose > 0, "Previous close is 0");
+            Assert.IsTrue(result);
+            Assert.AreEqual("GOOG", this.priceQuotes[0].Symbol);
+            Assert.AreEqual("Alphabet Inc.", this.priceQuotes[0].Name);
+            Assert.IsTrue(this.priceQuotes[0].LastPrice > 0);
+            Assert.IsTrue(this.priceQuotes[0].PreviousClose > 0);
             Assert.IsNotNull(this.priceQuotes[0].PriceChangeAbsolute);
             Assert.IsNotNull(this.priceQuotes[0].PriceChangePercent);
         }
 
-        [TestMethod]
-        public void TestGetPrices_GetMultipleValidStocks()
+		[Test]
+		public void TestGetPrices_GetMultipleValidStocks()
         {
             // Arrange
             this.symbols.Add("GOOG");
@@ -52,32 +51,32 @@ namespace InvestmentWizardTests
             bool result = client.GetPrices(this.symbols, out this.priceQuotes);
 
             // Assert
-            Assert.AreEqual(true, result, "Method return code is not successful");
+            Assert.AreEqual(true, result);
 
-            Assert.AreEqual("GOOG", this.priceQuotes[0].Symbol, "Ticker symbol is not correct");
-            Assert.AreEqual("Alphabet Inc.", this.priceQuotes[0].Name, "Company name is not correct");
-            Assert.IsTrue(this.priceQuotes[0].LastPrice > 0, "Last Price is 0");
-            Assert.IsTrue(this.priceQuotes[0].PreviousClose > 0, "Previous close is 0");
+            Assert.AreEqual("GOOG", this.priceQuotes[0].Symbol);
+            Assert.AreEqual("Alphabet Inc.", this.priceQuotes[0].Name);
+            Assert.IsTrue(this.priceQuotes[0].LastPrice > 0);
+            Assert.IsTrue(this.priceQuotes[0].PreviousClose > 0);
             Assert.IsNotNull(this.priceQuotes[0].PriceChangeAbsolute);
             Assert.IsNotNull(this.priceQuotes[0].PriceChangePercent);
 
-            Assert.AreEqual("AAPL", this.priceQuotes[1].Symbol, "Ticker symbol is not correct");
-            Assert.AreEqual("Apple Inc.", this.priceQuotes[1].Name, "Company name is not correct");
-            Assert.IsTrue(this.priceQuotes[1].LastPrice > 0, "Last Price is 0");
-            Assert.IsTrue(this.priceQuotes[1].PreviousClose > 0, "Previous close is 0");
+            Assert.AreEqual("AAPL", this.priceQuotes[1].Symbol);
+            Assert.AreEqual("Apple Inc.", this.priceQuotes[1].Name);
+            Assert.IsTrue(this.priceQuotes[1].LastPrice > 0);
+            Assert.IsTrue(this.priceQuotes[1].PreviousClose > 0);
             Assert.IsNotNull(this.priceQuotes[1].PriceChangeAbsolute);
             Assert.IsNotNull(this.priceQuotes[1].PriceChangePercent);
 
-            Assert.AreEqual("MSFT", this.priceQuotes[2].Symbol, "Ticker symbol is not correct");
-            Assert.AreEqual("Microsoft Corporation", this.priceQuotes[2].Name, "Company name is not correct");
-            Assert.IsTrue(this.priceQuotes[2].LastPrice > 0, "Last Price is 0");
-            Assert.IsTrue(this.priceQuotes[2].PreviousClose > 0, "Previous close is 0");
+            Assert.AreEqual("MSFT", this.priceQuotes[2].Symbol);
+            Assert.AreEqual("Microsoft Corporation", this.priceQuotes[2].Name);
+            Assert.IsTrue(this.priceQuotes[2].LastPrice > 0);
+            Assert.IsTrue(this.priceQuotes[2].PreviousClose > 0);
             Assert.IsNotNull(this.priceQuotes[2].PriceChangeAbsolute);
             Assert.IsNotNull(this.priceQuotes[2].PriceChangePercent);
         }
 
-        [TestMethod]
-        public void TestGetPrices_ReturnFalse_WhenSymbolIsNotFound()
+		[Test]
+		public void TestGetPrices_ReturnFalse_WhenSymbolIsNotFound()
         {
             // Arrange
             this.symbols.Add("XYZ");
@@ -88,8 +87,8 @@ namespace InvestmentWizardTests
             Assert.IsFalse(result);
         }
 
-        [TestMethod]
-        public void TestGetPrices_BadPriceReference()
+		[Test]
+		public void TestGetPrices_BadPriceReference()
         {
             // Arrange
             this.symbols.Add("GOOG");
@@ -99,11 +98,11 @@ namespace InvestmentWizardTests
             client.GetPrices(this.symbols, out this.priceQuotes);
 
             // Assert
-            Assert.IsNotNull(this.priceQuotes, "Price reference is null");
+            Assert.IsNotNull(this.priceQuotes);
         }
 
-        [TestMethod]
-        public void GetPrices_EmptySymbolList()
+		[Test]
+		public void GetPrices_EmptySymbolList()
         {
             // Arrange
 
@@ -114,8 +113,8 @@ namespace InvestmentWizardTests
             Assert.AreEqual(this.symbols.Count, this.priceQuotes.Count);
         }
 
-        [TestMethod]
-        public void YahooFinance_GetHistoricalPrice()
+		[Test]
+		public void YahooFinance_GetHistoricalPrice()
         {
             // Arrange
             string price = string.Empty;
@@ -126,13 +125,13 @@ namespace InvestmentWizardTests
             bool result = client.GetHistoricalPrice(symbol, date, ref price);
 
             // Assert
-            Assert.AreEqual(true, result, "Method return code is not successful");
+            Assert.IsTrue(result);
             Assert.IsNotNull(price);
-            Assert.IsTrue(Convert.ToDecimal(price) > 0m, "Price is not valid");
+            Assert.IsTrue(Convert.ToDecimal(price) > 0m);
         }
 
-        [TestMethod]
-        public void YahooFinance_GetHistoricalPrice_NonDividendStock()
+		[Test]
+		public void YahooFinance_GetHistoricalPrice_NonDividendStock()
         {
             // Arrange
             string price = null;
@@ -143,12 +142,12 @@ namespace InvestmentWizardTests
             bool result = client.GetHistoricalPrice(symbol, date, ref price);
 
             // Assert
-            Assert.AreEqual(true, result, "Method return code is not successful");
+            Assert.IsTrue(result);
             Assert.IsNotNull(price);
         }
 
-        [TestMethod]
-        public void YahooFinance_GetHistoricalPrice_InvalidStockTicker()
+		[Test]
+		public void YahooFinance_GetHistoricalPrice_InvalidStockTicker()
         {
             // Arrange
             string price = null;
@@ -158,8 +157,8 @@ namespace InvestmentWizardTests
             // Act
             bool result = client.GetHistoricalPrice(symbol, date, ref price);
 
-            // Assert
-            Assert.AreEqual(false, result, "Method return code is not successful");
+			// Assert
+			Assert.IsFalse(result);
             Assert.IsNull(price);
         }
     }

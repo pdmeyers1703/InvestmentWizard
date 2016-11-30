@@ -1,12 +1,12 @@
 ﻿namespace InvestmentWizardTests
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using InvestmentWizard;
+	using NUnit.Framework;
 
-    [TestClass]
+	[TestFixture]
     public class PriceQuoteTest
     {
-        [TestMethod]
+        [Test]
         public void GetSymbolTest()
         {
             // Arrange
@@ -17,11 +17,11 @@
             quote.Symbol = symbol;
 
             // Assert
-            Assert.AreEqual(symbol, quote.Symbol, "Quote symbol is not equal to \"" + symbol + "\"");
+            Assert.AreEqual(symbol, quote.Symbol);
         }
 
-        [TestMethod]
-        public void GetNameTest()
+		[Test]
+		public void GetNameTest()
         {
             // Arrange
             PriceQuote quote = new PriceQuote();
@@ -31,11 +31,11 @@
             quote.Name = name;
 
             // Assert
-            Assert.AreEqual(name, quote.Name, "Quote name is not equal to \"" + name + "\"");
+            Assert.AreEqual(name, quote.Name);
         }
 
-        [TestMethod]
-        public void GetLastPriceTest()
+		[Test]
+		public void GetLastPriceTest()
         {
             // Arrange
             PriceQuote quote = new PriceQuote();
@@ -45,11 +45,11 @@
             quote.LastPrice= lastPrice;
 
             // Assert
-            Assert.AreEqual(lastPrice, quote.LastPrice, "Quote last price is not equal to \"" + lastPrice + "\"");
+            Assert.AreEqual(lastPrice, quote.LastPrice);
         }
 
-        [TestMethod]
-        public void GetLastPreviousCloseTest()
+		[Test]
+		public void GetLastPreviousCloseTest()
         {
             // Arrange
             PriceQuote quote = new PriceQuote();
@@ -59,11 +59,11 @@
             quote.PreviousClose = prevClose;
 
             // Assert
-            Assert.AreEqual(prevClose, quote.PreviousClose, "Quote previous close is not equal to \"" + prevClose + "\"");
+            Assert.AreEqual(prevClose, quote.PreviousClose);
         }
 
-        [TestMethod]
-        public void GetPriceChangeAbsoluteTest()
+		[Test]
+		public void GetPriceChangeAbsoluteTest()
         {
             // Arrange
             PriceQuote quote = new PriceQuote();
@@ -73,11 +73,11 @@
             quote.PriceChangeAbsolute = priceChanage;
 
             // Assert
-            Assert.AreEqual(priceChanage, quote.PriceChangeAbsolute, "Price change is not equal to \"" + priceChanage + "\"");
+            Assert.AreEqual(priceChanage, quote.PriceChangeAbsolute);
         }
 
-        [TestMethod]
-        public void GetPriceChangePercentTest()
+		[Test]
+		public void GetPriceChangePercentTest()
         {
             // Arrange
             PriceQuote quote = new PriceQuote();
@@ -87,7 +87,7 @@
             quote.PriceChangePercent = priceChanage;
 
             // Assert
-            Assert.AreEqual(priceChanage, quote.PriceChangePercent, "Price change percent is not equal to \"" + priceChanage + "\"");
+            Assert.AreEqual(priceChanage, quote.PriceChangePercent);
         }
     }
 }
