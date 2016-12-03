@@ -1,7 +1,6 @@
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio Express 2012 for Windows Desktop
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvestmentWizard", "InvestmentWizard\InvestmentWizard.csproj", "{8373CCAB-B32E-469C-A00A-66AAABB09384}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvestmentWizardTests", "InvestmentWizardTests\InvestmentWizardTests.csproj", "{D0A389C4-21BB-41A6-91A9-8DF8A6A8E225}"

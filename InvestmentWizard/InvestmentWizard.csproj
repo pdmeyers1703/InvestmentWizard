@@ -90,6 +90,7 @@
     <Compile Include="Intefaces\ICurrentPositionsController.cs" />
     <Compile Include="Intefaces\ICurrentPositionsView.cs" />
     <Compile Include="Intefaces\IDatabase.cs" />
+    <Compile Include="Intefaces\IEquityQuoteReadModel.cs" />
     <Compile Include="Intefaces\IListObservable.cs" />
     <Compile Include="Intefaces\IObserver.cs" />
     <Compile Include="Intefaces\ITransactionsListWriter.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Forms\Buy.Designer.cs">
       <DependentUpon>Buy.cs</DependentUpon>
     </Compile>
+    <Compile Include="Source\EquityQuoteReadModel.cs" />
     <Compile Include="Source\CurrentPositionsController.cs" />
     <Compile Include="Source\DatabaseFactory.cs" />
     <Compile Include="Source\DataConverter.cs" />
