@@ -10,7 +10,7 @@ namespace InvestmentWizard
 	/// <summary>
 	/// Handles the updating of real-time and historical financial data.
 	/// </summary>
-	public class EquityQuoteReadModel : IListObservable<PriceQuote>, IEquityQuoteReadModel
+	public class EquityQuoteReadModel : IEquityQuoteReadModel
 	{
 		private IFinancialData financialData;
 
@@ -27,20 +27,6 @@ namespace InvestmentWizard
 		}
 
 		/// <summary>
-		/// Handler that is called when the financial data is updated.
-		/// </summary>
-		private event ListChangedEventHandler<PriceQuote> QuoteUpdateHandler;
-
-		/// <summary>
-		///  Register event handler for price quotes.
-		/// </summary>
-		/// <param name="handler">Event handler </param>
-		public void RegisterObserver(ListChangedEventHandler<PriceQuote> handler)
-		{
-			this.QuoteUpdateHandler += handler;
-		}
-
-		/// <summary>
 		/// Updates all quotes
 		/// </summary>
 		public void Update()
@@ -52,8 +38,6 @@ namespace InvestmentWizard
 				List<PriceQuote> priceQuotes;
 				this.financialData.GetPrices(equitySymbols, out priceQuotes);
 				this.realtimePriceQuotes = priceQuotes.ToDictionary(q => q.Symbol, x => x);
-
-				this.QuoteUpdateHandler(priceQuotes);
 			}
 		}
 

@@ -15,7 +15,7 @@ namespace InvestopediaTests.Tests
 	{
 		private Mock<IFinancialData> mockFinancialData;
 		private Mock<ListChangedEventHandler<PriceQuote>> mockEventHandler;
-		private EquityQuoteReadModel model;
+		private IEquityQuoteReadModel model;
 
 		[SetUp]
 		public void SetUp()
@@ -30,7 +30,6 @@ namespace InvestopediaTests.Tests
 			this.mockFinancialData.Setup(f => f.GetPrices(new List<string>() { Any.EquitySymbol, Any.OtherEquitySymbol }, out twoPrices));
 
 			this.model = new EquityQuoteReadModel(this.mockFinancialData.Object);
-			this.model.RegisterObserver(this.mockEventHandler.Object);
 		}
 
 		[Test, TestCaseSource("TestCaseEquitySymbols")]
@@ -48,37 +47,6 @@ namespace InvestopediaTests.Tests
 			else
 			{
 				this.mockFinancialData.Verify(f => f.GetPrices(new List<string>(equitySymbols), out priceQuotes), Times.Once);
-			}
-		}
-
-		[Test]
-		public void UpdateCallsEventHandlerCalledOnce()
-		{
-			this.model.AddRealTimeQuote(new string[] { Any.EquitySymbol, Any.OtherEquitySymbol });
-
-			this.model.Update();
-
-			this.mockEventHandler.Verify(e => e(It.IsAny<IList<PriceQuote>>()), Times.Once);
-		}
-
-		[Test, TestCaseSource("TestCaseEquitySymbols")]
-		public void UpdateCallsEventHandlerWithCorrectPriceQuote(string[] equitySymbols)
-		{
-			this.model.AddRealTimeQuote(equitySymbols);
-
-			this.model.Update();
-
-			if (equitySymbols.Length == 0)
-			{
-				this.mockEventHandler.Verify(e => e(new List<PriceQuote>()), Times.Never);
-			}
-			else if (equitySymbols[0] == Any.EquitySymbol && equitySymbols.Length == 1)
-			{
-				this.mockEventHandler.Verify(e => e(new List<PriceQuote>() { Any.Price }), Times.Once);
-			}
-			else if (equitySymbols[0] == Any.EquitySymbol && equitySymbols[1] == Any.OtherEquitySymbol)
-			{
-				this.mockEventHandler.Verify(e => e(new List<PriceQuote>() { Any.Price, Any.OtherPrice }), Times.Once);
 			}
 		}
 

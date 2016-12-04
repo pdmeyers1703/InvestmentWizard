@@ -10,6 +10,11 @@ namespace InvestmentWizard
 	public interface IEquityQuoteReadModel
 	{
 		/// <summary>
+		/// Updates all quotes
+		/// </summary>
+		void Update();
+
+		/// <summary>
 		///  Register one or more symbols with the model
 		/// </summary>
 		/// <param name="equitySymbols"></param>

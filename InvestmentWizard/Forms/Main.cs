@@ -16,6 +16,7 @@ namespace InvestmentWizard
 		private IFinancialData financialDataClient = new YahooFinancalDataClient();
 		private ITransactionController transactionController;
 		private ICurrentPositionsController currentPositionsController;
+		private IEquityQuoteReadModel equityQuoteReadModel;
 		private IList<ITransaction> openTransactionsList;
 		private IViewFormatter<ICurrentPosition> currentpositionsFormatter;
 
@@ -24,10 +25,12 @@ namespace InvestmentWizard
 		/// </summary>
 		/// <param name="transactionController">The controller for all transactions</param>
 		/// <param name="currentPositionsController">The controller for current positions.</param>
+		/// <param name="equityQuoteReadModel">The model that contains all the equity quotes.</param>
 		/// <param name="currentpositionsFormatter">Formats data for current positions view</param>
 		public Main(
 			ITransactionController transactionController,
 			ICurrentPositionsController currentPositionsController,
+			IEquityQuoteReadModel equityQuoteReadModel,
 			IViewFormatter<ICurrentPosition> currentpositionsFormatter)
 		{
 			this.InitializeComponent();
@@ -36,6 +39,7 @@ namespace InvestmentWizard
 			this.transactionController.TransactionView = this;
 			this.currentPositionsController = currentPositionsController;
 			this.currentPositionsController.CurrentPositionsView = this;
+			this.equityQuoteReadModel = equityQuoteReadModel;
 
 			this.currentpositionsFormatter = currentpositionsFormatter;
 		}
@@ -86,10 +90,12 @@ namespace InvestmentWizard
 		{
 			this.transactionController.Initialize();
 			this.currentPositionsController.Initialize();
+			this.equityQuoteReadModel.AddRealTimeQuote(new string[] { "^gspc" });
 
 			try
 			{
 				this.transactionController.Update();
+				this.equityQuoteReadModel.Update();
 			}
 			catch
 			{
@@ -109,13 +115,13 @@ namespace InvestmentWizard
 			{
 				this.lastQuoteUpdateStatusLabel.Text = "Updating Quotes...";
 
-				PriceQuote sp500 = this.GetSP500Quote();
+				PriceQuote sp500 = this.equityQuoteReadModel.GetRealTimeQuote("^gspc");
 				decimal sp500LastYear = Convert.ToDecimal(this.GetSP500QuoteYTD());
 				double sp500YTD = (double)Math.Round((Convert.ToDecimal(sp500.PreviousClose) - sp500LastYear) / sp500LastYear * 100, 2);
 				this.sp00TodayTextStatusLabel.Text = sp500.Name + ": Today - ";
 				this.sp500TodayValueStatusLabel.Text = sp500.PriceChangePercent;
-				this.sp00YtdTextStatusLabel.Text = " YTD - ;";
-				this.sp500YtdValueStatusLabel.Text = sp500YTD.ToString();
+				this.sp00YtdTextStatusLabel.Text = " YTD - ";
+				this.sp500YtdValueStatusLabel.Text = sp500YTD.ToString() + "%";
 
 				this.currentPositionsController.Update();
 			}
@@ -128,19 +134,6 @@ namespace InvestmentWizard
 			Cursor.Current = Cursors.Default;
 			this.lastQuoteUpdateStatusLabel.Text = "Quotes Last Updated on:  " + DateTime.Now.ToString();
 		}
-
-        /// <summary>
-        /// Retrieves the S&P 500 Index quote
-        /// </summary>
-        /// <returns>Price Quote</returns>
-        private PriceQuote GetSP500Quote()
-        {
-            List<string> ticker = new List<string>();
-            List<PriceQuote> standardAndPoors500Qoute = new List<PriceQuote>();
-            ticker.Add("^gspc");
-            this.financialDataClient.GetPrices(ticker, out standardAndPoors500Qoute);
-            return standardAndPoors500Qoute[0];
-        }
 
         /// <summary>
         /// Retrieves the S&P 500 Index quote from the last
