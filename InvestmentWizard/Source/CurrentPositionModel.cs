@@ -251,7 +251,7 @@
                 if (t.PurchasedDate < DateTimeHelper.GetYTD())
                 {
                     string lastYearsPriceString = string.Empty;
-                    this.server.GetHistoricalPrice(t.EquitySymbol, DateTimeHelper.GetYTD(), ref lastYearsPriceString);
+                    this.server.GetHistoricalPrice(t.EquitySymbol, DateTimeHelper.GetYTD(), out lastYearsPriceString);
                     if (!string.IsNullOrEmpty(lastYearsPriceString))
                     {
                         cost += Convert.ToDecimal(lastYearsPriceString) * Convert.ToDecimal(t.Quanity);

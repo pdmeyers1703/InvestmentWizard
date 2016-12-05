@@ -43,7 +43,7 @@
             return true;
         }
 
-        public bool GetHistoricalPrice(string tickerSymbols, DateTime date, ref string price)
+        public bool GetHistoricalPrice(string tickerSymbols, DateTime date, out string price)
         {
             string url = "http://ichart.finance.yahoo.com/table.csv?s=";
             string csv = string.Empty;
@@ -63,6 +63,7 @@
             }
             catch (WebException)
             {
+				price = null;
                 return false;
             }
 

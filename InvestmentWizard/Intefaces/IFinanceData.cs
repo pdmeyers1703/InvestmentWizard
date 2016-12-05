@@ -29,7 +29,7 @@ namespace InvestmentWizard
         /// <param name="date"></param>
         /// <param name="price"></param>
         /// <returns></returns>
-        bool GetHistoricalPrice(string tickerSymbols, DateTime date, ref string price);
+        bool GetHistoricalPrice(string tickerSymbols, DateTime date, out string price);
 
         /// <summary>
         /// 

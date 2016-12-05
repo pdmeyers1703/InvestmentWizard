@@ -122,7 +122,7 @@
             DateTime date = new DateTime(2014, 10, 1);
 
             // Act
-            bool result = client.GetHistoricalPrice(symbol, date, ref price);
+            bool result = client.GetHistoricalPrice(symbol, date, out price);
 
             // Assert
             Assert.IsTrue(result);
@@ -139,7 +139,7 @@
             DateTime date = new DateTime(2014, 10, 1);
 
             // Act
-            bool result = client.GetHistoricalPrice(symbol, date, ref price);
+            bool result = client.GetHistoricalPrice(symbol, date, out price);
 
             // Assert
             Assert.IsTrue(result);
@@ -155,7 +155,7 @@
             DateTime date = new DateTime(2014, 10, 1);
 
             // Act
-            bool result = client.GetHistoricalPrice(symbol, date, ref price);
+            bool result = client.GetHistoricalPrice(symbol, date, out price);
 
 			// Assert
 			Assert.IsFalse(result);
