@@ -54,6 +54,8 @@
 			container.AddRegistration(typeof(IListObservable<ICurrentPosition>), currentpositionsModelRegistration);
 			container.AddRegistration(typeof(IObserver<ITransaction>), currentpositionsModelRegistration);
 
+			container.Register<IEquityQuoteReadModel, EquityQuoteReadModel>(Lifestyle.Singleton);
+
 			container.Register<ITransactionController, TransactionController>(Lifestyle.Singleton);
 
 			var currentPositionControllerRegistration = Lifestyle.Singleton.CreateRegistration<CurrentPositionsController>(container);

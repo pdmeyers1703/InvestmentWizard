@@ -1,17 +1,41 @@
-﻿namespace InvestmentWizard
+﻿// <copyright file="PriceQuote.cs" company="Peter Meyers">
+//     Copyright (c) Peter Meyers. All rights reserved.
+// </copyright>
+
+namespace InvestmentWizard
 { 
     public class PriceQuote
     {
-        public string Symbol { get; set; }
+		public PriceQuote()
+		{
+		}
 
-        public string Name { get; set; }
+		public PriceQuote(
+			string symbol, 
+			string name, 
+			decimal lastPrice, 
+			decimal prevClose,
+			string priceChangeAbsolute,
+			string priceChangePercent)
+		{
+			this.Symbol = symbol;
+			this.Name = name;
+			this.LastPrice = lastPrice;
+			this.PreviousClose = prevClose;
+			this.PriceChangeAbsolute = priceChangeAbsolute;
+			this.PriceChangePercent = priceChangePercent;
+		}
 
-        public decimal LastPrice { get; set; }
+		public string Symbol { get; set; }
 
-        public decimal PreviousClose { get; set; }
+		public string Name { get; set; }
 
-        public string PriceChangeAbsolute { get; set; }
+		public decimal LastPrice { get; set; }
 
-        public string PriceChangePercent { get; set; }
-    }
+		public decimal PreviousClose { get; set; }
+
+		public string PriceChangeAbsolute { get; set; }
+
+		public string PriceChangePercent { get; set; }
+	}
 }
