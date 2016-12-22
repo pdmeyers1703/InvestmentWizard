@@ -10,7 +10,7 @@ namespace InvestmentWizard
 	using System.Windows.Forms;
 
 	public partial class DlgSell : Form
-	{				   
+	{
 		private ITransactionController transactionController;
 		private IEnumerable<ITransaction> openTransactions;
 
@@ -26,14 +26,31 @@ namespace InvestmentWizard
 		/// Constructor that initializes a combo box.
 		/// </summary>
 		/// <param name="currentHoldings">items to fill combo box</param>
-		public DlgSell(IEnumerable<ITransaction> openTransactions, ITransactionController transactionController) : this()
+		public DlgSell(IList<ITransaction> openTransactions, ITransactionController transactionController) : this()
 		{
 			this.transactionController = transactionController;
 			this.openTransactions = openTransactions;
 
-			foreach (var t in this.openTransactions)
+			IEnumerable<ITransaction> orderOpenTransactions = this.openTransactions
+				.OrderBy(o => o.EquitySymbol)
+				.ThenBy(o => o.PurchasedDate);
+
+			this.openPositionsTreeView.Nodes.Clear();
+
+			foreach (var equityName in orderOpenTransactions.Select(o => o.EquitySymbol).Distinct().ToList())
 			{
-				this.comboBoxSell.Items.Add(t.Quanity + " shares of " + t.EquitySymbol + " (" + t.PurchasedDate + ")");
+				TreeNode newNode = new TreeNode(equityName);
+				foreach (var transaction in orderOpenTransactions.Where(o => o.EquitySymbol == equityName).ToList())
+				{
+					TreeNode newChildNode = 
+						new TreeNode(transaction.PurchasedDate.Value.ToShortDateString() + " - " +
+						transaction.Quanity + " Shares @ $" + 
+						((double)transaction.Cost / transaction.Quanity).ToString("0.00"));
+					newChildNode.Tag = transaction;
+					newNode.Nodes.Add(newChildNode);
+				}
+
+				this.openPositionsTreeView.Nodes.Add(newNode);
 			}
 		}
 
@@ -44,37 +61,48 @@ namespace InvestmentWizard
 		/// <param name="e"></param>
 		private void ButtonAccept_Click(object sender, EventArgs e)
 		{
-			if (this.comboBoxSell.SelectedItem == null)
+			List<ITransaction> sellTransactions = new List<ITransaction>();
+
+			foreach (TreeNode parentNode in this.openPositionsTreeView.Nodes)
 			{
-				MessageBox.Show("Select an open open position from the combo box");
+				foreach (TreeNode childNode in parentNode.Nodes)
+				{
+					if (childNode.Checked)
+					{
+						sellTransactions.Add((ITransaction)childNode.Tag);
+					}
+				}
 			}
-			else if ((this.textBoxQuantity.Text == string.Empty) &&
-						(Convert.ToDouble(this.textBoxQuantity) > 0.0f))
-			{
-			}
-			else if ((this.textBoxSalesProceeds.Text == string.Empty) &&
-						(Convert.ToDecimal(this.textBoxSalesProceeds) > 0.00m))
+
+			this.DialogResult = DialogResult.None;
+
+			if ((this.textBoxSalesProceeds.Text == string.Empty) ||
+				((this.textBoxSalesProceeds.Text != string.Empty) && 
+				Convert.ToDecimal(this.textBoxSalesProceeds.Text) < 0.01m))
 			{
 				MessageBox.Show("Please enter a sales price greater than $0.00");
 			}
+			else if (sellTransactions.Count() == 0)
+			{
+				MessageBox.Show("Please select at least 1 transaction to sell");
+			}
 			else
 			{
-				try
+				if (DialogResult.Yes == MessageBox.Show(
+					"Are you sure you would like to sell this position?",
+					"Confirmation",
+					MessageBoxButtons.YesNo,
+					MessageBoxIcon.Question))
 				{
-					if (DialogResult.Yes == MessageBox.Show("Are you sure you would like to sell this position?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+					this.DialogResult = DialogResult.OK;
+					try
 					{
-						ITransaction selectedItem = this.openTransactions.ElementAt(this.comboBoxSell.SelectedIndex);
-						this.transactionController.SellPosition(
-							Convert.ToInt32(selectedItem.RowID), 
-							this.datePicker.Value, 
-							Convert.ToDouble(this.textBoxQuantity.Text), 
-							Convert.ToDecimal(this.textBoxSalesProceeds.Text));
-						this.Close();
+						this.transactionController.SellPositions(sellTransactions, this.datePicker.Value, Convert.ToDecimal(this.textBoxSalesProceeds.Text));
 					}
-				}
-				catch
-				{
-					MessageBox.Show("Error entering sell data");
+					catch
+					{
+						MessageBox.Show("Failure to sell one or more transactions");
+					}
 				}
 			}
 		}
@@ -87,6 +115,44 @@ namespace InvestmentWizard
 		private void ButtonCancel_MouseClick(object sender, MouseEventArgs e)
 		{
 			this.Close();
+		}
+
+		/// <summary>
+		/// On expanding a node, collapse all other nodes
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void OpenPositionsTreeView_AfterExpand(object sender, TreeViewEventArgs e)
+		{
+			foreach (TreeNode node in this.openPositionsTreeView.Nodes)
+			{
+				if (node != e.Node)
+				{
+					node.Collapse();
+					node.Checked = false;
+
+					foreach (TreeNode childNode in node.Nodes)
+					{
+						childNode.Checked = false;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// If Top level node is checked or unchecked apply that state to its children
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void OpenPositionsTreeView_AfterChecked(object sender, TreeViewEventArgs e)
+		{
+			if (e.Node.Parent == null)
+			{
+				foreach (TreeNode childNode in e.Node.Nodes)
+				{
+					childNode.Checked = e.Node.Checked;
+				}
+			}
 		}
 	}
 }

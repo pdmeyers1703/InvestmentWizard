@@ -6,6 +6,7 @@ namespace InvestmentWizard
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 
 	/// <summary>
 	/// Controller for all transactions
@@ -19,24 +20,20 @@ namespace InvestmentWizard
         private IListObservable<ITransaction> openTransactionsObserver;
 		private ITransactionsListWriter transactionWriter;
 		private ITransactionsView transactionView;
-        private IFinancialData server;
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="transactionsObserver">observer for entire transactions list </param>
 		/// <param name="openTransactionsObserver">observer for all open transactions</param>
-		/// <param name="dataServer">Data server for real-time quotes</param>
 		public TransactionController(
 		IListObservable<ITransaction> transactionsObserver, 
 		IListObservable<ITransaction> openTransactionsObserver,
-		ITransactionsListWriter transactionWriter,
-		IFinancialData dataServer) 
+		ITransactionsListWriter transactionWriter) 
 	{
 			this.transactionsObserver = transactionsObserver;
 			this.openTransactionsObserver = openTransactionsObserver;
 			this.transactionWriter = transactionWriter;
-			this.server = dataServer;
 		}
 
 		/// <summary>
@@ -93,15 +90,22 @@ namespace InvestmentWizard
 		}
 
 		/// <summary>
-		/// Sell open position
+		/// Sell open positions
 		/// </summary>
-		/// <param name="rowIndex">The row indexof holding to sell</param>
+		/// <param name="transactions">List of transactions to be sold.</param>
 		/// <param name="saleDate">Date of sale.</param>
-		/// <param name="quantity">Number of shares sold.</param>
-		/// <param name="saleProceeds">Total proceeds of sale.</param>	
-		public void SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds)
+		/// <param name="saleProceeds">Total proceeds of sale.</param>
+		public void SellPositions(IList<ITransaction> transactions, DateTime saleDate, decimal saleProceeds)
 		{
-			this.transactionWriter.Sell(rowIndex, saleDate, quantity, saleProceeds);
+			foreach (var transaction in transactions)
+			{
+				this.transactionWriter.Sell(
+					transaction.RowID, 
+					saleDate, 
+					transaction.Quanity, 
+					Math.Round(saleProceeds * (decimal)(transaction.Quanity / transactions.Sum(t => t.Quanity)), 2));
+			}
+
 			this.Update();
 		}
 
@@ -137,21 +141,21 @@ namespace InvestmentWizard
 		/// <param name="startDate"> Begining of time range</param>
 		/// <param name="endDate">End of time range</param>
 		/// <returns>List of dividend payments</returns>
-		private List<decimal> GetDividend(string tickerSymbol, DateTime? startDate, DateTime? endDate)
-		{
-			List<decimal> dividends = new List<decimal>();
-			if (startDate == null)
-			{
-				throw new Exception();
-			}
+		////private List<decimal> GetDividend(string tickerSymbol, DateTime? startDate, DateTime? endDate)
+		////{
+		////	List<decimal> dividends = new List<decimal>();
+		////	if (startDate == null)
+		////	{
+		////		throw new Exception();
+		////	}
 
-			if (endDate == null)
-			{
-				endDate = DateTime.Now;
-			}
+		////	if (endDate == null)
+		////	{
+		////		endDate = DateTime.Now;
+		////	}
 
-			this.server.GetDividendsOverTimeSpan(tickerSymbol, startDate.Value, endDate.Value, ref dividends);
-			return dividends;
-		}
+		////	this.server.GetDividendsOverTimeSpan(tickerSymbol, startDate.Value, endDate.Value, ref dividends);
+		////	return dividends;
+		////}
 	} 
 }
