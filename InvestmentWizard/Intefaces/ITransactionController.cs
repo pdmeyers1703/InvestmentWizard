@@ -5,6 +5,7 @@
 namespace InvestmentWizard
 {
 	using System;
+	using System.Collections.Generic;
 
 	/// <summary>
 	/// Controller for transaction model
@@ -36,13 +37,12 @@ namespace InvestmentWizard
 		void AddPosition(DateTime date, string stock, double quantity, decimal cost);
 
 		/// <summary>
-		/// Sell open position
+		/// Sell open positions
 		/// </summary>
-		/// <param name="rowIndex">The row indexof holding to sell</param>
+		/// <param name="transactions">List of transactions to be sold.</param>
 		/// <param name="saleDate">Date of sale.</param>
-		/// <param name="quantity">Number of shares sold.</param>
-		/// <param name="saleProceeds">Total proceeds of sale.</param>	
-		void SellPosition(int rowIndex, DateTime saleDate, double quantity, decimal saleProceeds);
+		/// <param name="saleProceeds">Total proceeds of sale.</param>
+		void SellPositions(IList<ITransaction> transactions, DateTime saleDate, decimal saleProceeds);
 
 		/// <summary>
 		/// Current holding is split

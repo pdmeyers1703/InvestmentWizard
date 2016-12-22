@@ -66,6 +66,7 @@
     <Compile Include="Tests\AccessDatabaseTest.cs" />
     <Compile Include="Tests\EquityQuoteReadModelTests.cs" />
     <Compile Include="Tests\PriceQuoteTest.cs" />
+    <Compile Include="Tests\TransactionControllerTests.cs" />
     <Compile Include="Tests\TransactionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\YahooFinanceTest.cs" />
