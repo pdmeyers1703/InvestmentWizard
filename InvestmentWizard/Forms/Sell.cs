@@ -39,7 +39,7 @@ namespace InvestmentWizard
 
 			foreach (var equityName in orderOpenTransactions.Select(o => o.EquitySymbol).Distinct().ToList())
 			{
-				TreeNode newNode = new TreeNode(equityName);
+				TreeNode newNode = new TreeNode();
 				foreach (var transaction in orderOpenTransactions.Where(o => o.EquitySymbol == equityName).ToList())
 				{
 					TreeNode newChildNode = 
@@ -50,6 +50,7 @@ namespace InvestmentWizard
 					newNode.Nodes.Add(newChildNode);
 				}
 
+				this.SetParentNodeText(newNode); 
 				this.openPositionsTreeView.Nodes.Add(newNode);
 			}
 		}
@@ -153,6 +154,30 @@ namespace InvestmentWizard
 					childNode.Checked = e.Node.Checked;
 				}
 			}
+			else
+			{
+				this.SetParentNodeText(e.Node.Parent);
+			}
+		}	 
+
+		private void SetParentNodeText(TreeNode parentNode)
+		{
+			double quantitySelected = 0.0f;
+			double totalQuantity = 0.0f;
+			foreach (TreeNode childNode in parentNode.Nodes)
+			{
+				ITransaction transaction = (ITransaction)childNode.Tag;
+
+				if (childNode.Checked)
+				{
+					quantitySelected += transaction.Quanity;
+				}
+
+				totalQuantity += transaction.Quanity;
+			}
+
+			parentNode.Text = ((ITransaction)parentNode.FirstNode.Tag).EquitySymbol + " -  (" + quantitySelected + "/"
+				+ totalQuantity + ")";
 		}
 	}
 }

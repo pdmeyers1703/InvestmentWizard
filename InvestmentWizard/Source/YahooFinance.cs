@@ -149,7 +149,7 @@
 
             string[] cols = rows[1].Split(',');
 
-            return cols[6];
+            return cols.Length == 6 ? cols[6] : string.Empty;
         }
 
         private List<decimal> GetCumulativeHistoryCSVDividends(string csv)
